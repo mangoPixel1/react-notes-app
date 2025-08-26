@@ -1,17 +1,27 @@
 import React from "react";
 
+// Components
+import Search from "./Search";
+
 function Header() {
   return (
-    <header className="flex justify-between">
-      <h1 className="text-2xl font-medium">Notepad</h1>
-      <input
-        type="text"
-        placeholder="Search note..."
-        className="border border-gray-500 px-2 py-2"
-      />
-      <button className="bg-gray-200 px-2 py-2 cursor-pointer hover:bg-gray-300 transition duration-300">
-        Menu
-      </button>
+    <header className="space-y-4">
+      <div className="flex justify-between">
+        <h1 className="text-2xl font-medium">Notes</h1>
+        <div className="space-x-2">
+          <button className="fixed bottom-10 right-5 sm:static bg-gray-200 px-2 py-2 cursor-pointer hover:bg-gray-300 transition duration-300">
+            New Note
+          </button>
+          <button className="bg-gray-200 px-2 py-2 cursor-pointer hover:bg-gray-300 transition duration-300">
+            View
+          </button>
+          <button className="bg-gray-200 px-2 py-2 cursor-pointer hover:bg-gray-300 transition duration-300">
+            Theme
+          </button>
+        </div>
+      </div>
+
+      <Search />
     </header>
   );
 }

@@ -4,3 +4,5 @@
 - notepad
   https://dribbble.com/shots/26070088-Simple-note-taking-app
 - pomodoro timer
+  use bootstrap
+  take figma course
