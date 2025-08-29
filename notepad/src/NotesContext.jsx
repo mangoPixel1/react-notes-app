@@ -1,5 +1,6 @@
 import { useReducer, createContext } from "react";
 
+// Allows components to access the context through useContext
 export const NotesContext = createContext();
 
 const initialState = {
@@ -25,17 +26,23 @@ function notesReducer(state, action) {
   }
 }
 
+// Makes context accessible to nested child components
 export function NotesProvider({ children }) {
   const [state, dispatch] = useReducer(notesReducer, initialState);
 
-  function addNote() {}
+  function addNote(title, body, color) {
+    dispatch({
+      type: "ADD_NOTE",
+      payload: { title: title, body: body, color: color },
+    });
+  }
 
-  function removeNote() {}
+  function removeNote(id) {}
 
   function editNote() {}
 
   return (
-    <NotesContext.Provider value={{ notes: state.notesList }}>
+    <NotesContext.Provider value={{ notes: state.notesList, addNote }}>
       {children}
     </NotesContext.Provider>
   );

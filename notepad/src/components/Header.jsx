@@ -1,9 +1,12 @@
-import React from "react";
+import { useContext } from "react";
+import { NotesContext } from "../NotesContext";
 
 // Components
 import Search from "./Search";
 
 function Header() {
+  const { addNote } = useContext(NotesContext);
+
   return (
     <header className="space-y-4">
       <div className="flex justify-between">
