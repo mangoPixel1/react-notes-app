@@ -8,14 +8,14 @@ import Header from "./components/Header";
 import NotesView from "./components/NotesView";
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [addMode, setAddMode] = useState(false);
 
   return (
     <NotesProvider>
       <div className="flex justify-center p-5 sm:px-10">
         <div className="w-full max-w-3xl">
-          <Header />
-          <NotesView />
+          <Header addMode={addMode} setAddMode={setAddMode} />
+          <NotesView addMode={addMode} setAddMode={setAddMode} />
         </div>
       </div>
     </NotesProvider>

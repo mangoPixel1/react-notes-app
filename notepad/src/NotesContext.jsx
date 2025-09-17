@@ -10,7 +10,7 @@ const initialState = {
 function notesReducer(state, action) {
   switch (action.type) {
     case "ADD_NOTE":
-      const newDate = Date.now();
+      const newDate = new Date();
       const noteObj = {
         id: crypto.randomUUID(),
         creationDate: newDate,
@@ -19,8 +19,8 @@ function notesReducer(state, action) {
         body: action.payload.body,
         color: action.payload.color,
       };
-
       return { ...state, notesList: [...state.notesList, noteObj] };
+
     default:
       return state;
   }
@@ -30,10 +30,14 @@ function notesReducer(state, action) {
 export function NotesProvider({ children }) {
   const [state, dispatch] = useReducer(notesReducer, initialState);
 
-  function addNote(title, body, color) {
+  function addNote(newNote) {
     dispatch({
       type: "ADD_NOTE",
-      payload: { title: title, body: body, color: color },
+      payload: {
+        title: newNote.title,
+        body: newNote.body,
+        color: newNote.color,
+      },
     });
   }
 
@@ -42,8 +46,16 @@ export function NotesProvider({ children }) {
   function editNote() {}
 
   return (
-    <NotesContext.Provider value={{ notes: state.notesList, addNote }}>
+    <NotesContext.Provider
+      value={{
+        notes: state.notesList,
+        addNote,
+      }}
+    >
       {children}
     </NotesContext.Provider>
   );
 }
+
+// TODO
+// NotesView -> Cancel Button error with setState()
