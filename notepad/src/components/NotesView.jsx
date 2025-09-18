@@ -6,6 +6,7 @@ import NoteCard from "./NoteCard";
 
 function NotesView({ addMode, setAddMode }) {
   const { notes, addNote } = useContext(NotesContext);
+  const colorOptions = ["yellow", "red", "green", "orange", "blue", "gray"];
 
   const [newNoteData, setNewNoteData] = useState({
     title: "",
@@ -15,9 +16,7 @@ function NotesView({ addMode, setAddMode }) {
 
   const [error, setError] = useState("");
 
-  const colorOptions = ["yellow", "red", "green", "orange", "blue", "gray"];
-
-  const handleAddNote = (e) => {
+  function handleAddNote(e) {
     e.preventDefault();
 
     // Form validation to check for empty fields
@@ -42,9 +41,9 @@ function NotesView({ addMode, setAddMode }) {
 
     // Reset error messages
     setError("");
-  };
+  }
 
-  const handleCancelNote = (e) => {
+  function handleCancelNote(e) {
     // cancel adding note
     e.preventDefault();
     if (addMode) {
@@ -56,7 +55,7 @@ function NotesView({ addMode, setAddMode }) {
       });
       setError("");
     }
-  };
+  }
 
   useEffect(() => {
     console.log(notes);
@@ -157,6 +156,7 @@ function NotesView({ addMode, setAddMode }) {
         {notes.map((note) => (
           <NoteCard
             key={note.id}
+            id={note.id}
             title={note.title}
             body={note.body}
             creationDate={note.creationDate}

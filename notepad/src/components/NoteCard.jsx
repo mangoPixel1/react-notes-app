@@ -1,6 +1,13 @@
-import React from "react";
+import { useContext } from "react";
+import { NotesContext } from "../NotesContext";
 
-function NoteCard({ title, body, color, creationDate, lastEdited }) {
+function NoteCard({ id, title, body, color, creationDate, lastEdited }) {
+  const { removeNote } = useContext(NotesContext);
+
+  function handleRemoveNote() {
+    removeNote(id);
+  }
+
   const months = [
     "Jan",
     "Feb",
@@ -27,10 +34,22 @@ function NoteCard({ title, body, color, creationDate, lastEdited }) {
     <div className={`p-3 border border-${color}-400 bg-${color}-100`}>
       <h1 className="font-medium text-xl">{title}</h1>
       <p className="mb-4">{body}</p>
-      <span className="text-sm text-gray-500 italic">{`Created: ${formatDateStr(
-        creationDate
-      )}`}</span>
-      <br />
+      <div className="flex justify-between">
+        <p className="text-sm text-gray-500 italic">{`Created: ${formatDateStr(
+          creationDate
+        )}`}</p>
+        <div className="flex gap-2">
+          <button className="text-gray-600 hover:text-gray-700 cursor-pointer">
+            Edit
+          </button>
+          <button
+            onClick={handleRemoveNote}
+            className="text-red-600 hover:text-red-700 cursor-pointer"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
