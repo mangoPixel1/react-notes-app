@@ -1,9 +1,6 @@
 import { useContext } from "react";
 import { NotesContext } from "../NotesContext";
 
-// Components
-import Search from "./Search";
-
 function Header({ addMode, setAddMode }) {
   const { addNote } = useContext(NotesContext);
 
@@ -34,8 +31,6 @@ function Header({ addMode, setAddMode }) {
           </button>
         </div>
       </div>
-
-      <Search />
     </header>
   );
 }

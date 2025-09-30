@@ -2,6 +2,7 @@ import { useState, useContext, useEffect } from "react";
 import { NotesContext } from "../NotesContext";
 
 // Components
+import Search from "./Search";
 import NoteCard from "./NoteCard";
 
 function NotesView({ addMode, setAddMode }) {
@@ -63,8 +64,10 @@ function NotesView({ addMode, setAddMode }) {
 
   return (
     <div className="mt-8">
+      <Search />
+
       {addMode && (
-        <form className="mb-8">
+        <form className="my-8">
           <div className="space-y-2">
             <input
               className={`block border  ${
@@ -141,7 +144,7 @@ function NotesView({ addMode, setAddMode }) {
         </form>
       )}
 
-      <div className="mb-3">
+      <div className="my-3">
         <label htmlFor="sortBy" className="mr-2">
           Sort by
         </label>

@@ -30,9 +30,13 @@ function NoteCard({ id, title, body, color, creationDate, lastEdited }) {
     } ${date.getDate()}, ${date.getFullYear()}`;
   }
 
+  // Click on title triggers single note view
+
   return (
     <div className={`p-3 border border-${color}-400 bg-${color}-100`}>
-      <h1 className="font-medium text-xl">{title}</h1>
+      <h1 className="font-medium text-xl cursor-pointer hover:underline">
+        {title}
+      </h1>
       <p className="mb-4">{body}</p>
       <div className="flex justify-between">
         <p className="text-sm text-gray-500 italic">{`Created: ${formatDateStr(

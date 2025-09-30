@@ -116,6 +116,3 @@ export function NotesProvider({ children }) {
     </NotesContext.Provider>
   );
 }
-
-// TODO
-// NotesView -> Cancel Button error with setState()
