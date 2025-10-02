@@ -1,11 +1,15 @@
 import { useState, useContext, useEffect } from "react";
+
+// Contexts
+import { UIContext } from "../UIContext";
 import { NotesContext } from "../NotesContext";
 
 // Components
 import Search from "./Search";
 import NoteCard from "./NoteCard";
 
-function NotesView({ addMode, setAddMode }) {
+function NotesView() {
+  const { addMode, setAddMode } = useContext(UIContext);
   const { notes, addNote } = useContext(NotesContext);
   const colorOptions = ["yellow", "red", "green", "orange", "blue", "gray"];
 

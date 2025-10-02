@@ -1,16 +1,28 @@
 import { useState, createContext } from "react";
 
+// Components
+import NotesView from "./components/NotesView";
+import SingleNoteView from "./components/SingleNoteView";
+
 export const UIContext = createContext();
 
-const NOTES_VIEW_INDEX = 0; // All notes (default)
-const SINGLE_NOTE_VIEW = 1;
+export function UIProvider({ children }) {
+  const views = [NotesView, SingleNoteView];
+  const [currentViewIndex, setCurrentViewIndex] = useState(0); // set to NotesView by default
 
-const views = [NotesView, SingleNoteView];
-const [currentViewIndex, setCurrentViewIndex] = useState(NOTES_VIEW_INDEX);
-const CurrentView = views[currentViewIndex];
+  const [addMode, setAddMode] = useState(false);
 
-const [addMode, setAddMode] = useState(false);
-
-export function UIProvider(children) {
-  return <UIContext.Provider>{children}</UIContext.Provider>;
+  return (
+    <UIContext.Provider
+      value={{
+        views,
+        currentViewIndex,
+        setCurrentViewIndex,
+        addMode,
+        setAddMode,
+      }}
+    >
+      {children}
+    </UIContext.Provider>
+  );
 }
