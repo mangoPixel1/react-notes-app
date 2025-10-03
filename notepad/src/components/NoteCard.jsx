@@ -1,8 +1,18 @@
 import { useContext } from "react";
+
+// Contexts
+import { UIContext } from "../UIContext";
 import { NotesContext } from "../NotesContext";
 
 function NoteCard({ id, title, body, color, creationDate, lastEdited }) {
+  const { currentViewIndex, setCurrentViewIndex, setCurrentNoteID } =
+    useContext(UIContext);
   const { removeNote } = useContext(NotesContext);
+
+  function navigateToSingleNoteView() {
+    setCurrentNoteID(id); // set current note to this note's id
+    setCurrentViewIndex(1); // set view to SingleNoteView
+  }
 
   function handleRemoveNote() {
     removeNote(id);
@@ -34,7 +44,10 @@ function NoteCard({ id, title, body, color, creationDate, lastEdited }) {
 
   return (
     <div className={`p-3 border border-${color}-400 bg-${color}-100`}>
-      <h1 className="font-medium text-xl cursor-pointer hover:underline">
+      <h1
+        onClick={navigateToSingleNoteView}
+        className="font-medium text-xl cursor-pointer hover:underline"
+      >
         {title}
       </h1>
       <p className="mb-4">{body}</p>

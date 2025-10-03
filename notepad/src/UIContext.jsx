@@ -10,6 +10,8 @@ export function UIProvider({ children }) {
   const views = [NotesView, SingleNoteView];
   const [currentViewIndex, setCurrentViewIndex] = useState(0); // set to NotesView by default
 
+  const [currentNoteID, setCurrentNoteID] = useState(); // ID of note to display in SingleNoteView
+
   const [addMode, setAddMode] = useState(false);
 
   return (
@@ -18,6 +20,8 @@ export function UIProvider({ children }) {
         views,
         currentViewIndex,
         setCurrentViewIndex,
+        currentNoteID,
+        setCurrentNoteID,
         addMode,
         setAddMode,
       }}

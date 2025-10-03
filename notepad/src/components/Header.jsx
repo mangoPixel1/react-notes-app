@@ -1,8 +1,14 @@
 import { useContext } from "react";
-import { NotesContext } from "../NotesContext";
+import { UIContext } from "../UIContext";
 
-function Header({ addMode, setAddMode }) {
-  const { addNote } = useContext(NotesContext);
+function Header() {
+  const { setCurrentViewIndex, setCurrentNoteID, addMode, setAddMode } =
+    useContext(UIContext);
+
+  function navigateToNotesView() {
+    setCurrentNoteID(null);
+    setCurrentViewIndex(0); // set to NotesView
+  }
 
   function toggleAddMode() {
     if (!addMode) {
@@ -10,10 +16,19 @@ function Header({ addMode, setAddMode }) {
     }
   }
 
+  function toggleView() {
+    setCurrentViewIndex((prev) => (prev === 0 ? 1 : 0));
+  }
+
   return (
     <header className="space-y-4">
       <div className="flex justify-between">
-        <h1 className="text-2xl font-medium">Notes</h1>
+        <h1
+          onClick={navigateToNotesView}
+          className="text-2xl font-medium cursor-pointer"
+        >
+          Notes
+        </h1>
         <div className="space-x-2">
           <button
             onClick={toggleAddMode}

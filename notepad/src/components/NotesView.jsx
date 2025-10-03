@@ -63,7 +63,7 @@ function NotesView() {
   }
 
   useEffect(() => {
-    console.log(notes);
+    //console.log(notes);
   }, [notes]);
 
   return (

@@ -4,12 +4,16 @@ import React, { useContext, useState } from "react";
 import { UIContext } from "../UIContext";
 
 function View() {
-  const { views, currentViewIndex } = useContext(UIContext);
+  const { views, currentViewIndex, currentNoteID } = useContext(UIContext);
   const CurrentView = views[currentViewIndex];
 
   return (
     <>
-      <CurrentView />
+      {currentNoteID && currentViewIndex === 1 ? (
+        <CurrentView id={currentNoteID} />
+      ) : (
+        <CurrentView />
+      )}
     </>
   );
 }
