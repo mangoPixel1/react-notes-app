@@ -1,4 +1,4 @@
-import { useState, createContext } from "react";
+import { useState, useEffect, createContext } from "react";
 
 // Components
 import NotesView from "./components/NotesView";
@@ -10,9 +10,15 @@ export function UIProvider({ children }) {
   const views = [NotesView, SingleNoteView];
   const [currentViewIndex, setCurrentViewIndex] = useState(0); // set to NotesView by default
 
-  const [currentNoteID, setCurrentNoteID] = useState(); // ID of note to display in SingleNoteView
+  // ID of note to display in SingleNoteView
+  const [currentNoteID, setCurrentNoteID] = useState();
 
+  // Visibility state of add new note form in NotesView. Accessible in Header and NotesView
   const [addMode, setAddMode] = useState(false);
+
+  useEffect(() => {
+    setAddMode(false);
+  }, [currentViewIndex]);
 
   return (
     <UIContext.Provider

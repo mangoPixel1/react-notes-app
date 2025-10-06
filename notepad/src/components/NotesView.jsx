@@ -62,10 +62,6 @@ function NotesView() {
     }
   }
 
-  useEffect(() => {
-    //console.log(notes);
-  }, [notes]);
-
   return (
     <div className="mt-8">
       <Search />

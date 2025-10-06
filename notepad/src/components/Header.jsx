@@ -2,8 +2,13 @@ import { useContext } from "react";
 import { UIContext } from "../UIContext";
 
 function Header() {
-  const { setCurrentViewIndex, setCurrentNoteID, addMode, setAddMode } =
-    useContext(UIContext);
+  const {
+    currentViewIndex,
+    setCurrentViewIndex,
+    setCurrentNoteID,
+    addMode,
+    setAddMode,
+  } = useContext(UIContext);
 
   function navigateToNotesView() {
     setCurrentNoteID(null);
@@ -22,7 +27,7 @@ function Header() {
 
   return (
     <header className="space-y-4">
-      <div className="flex justify-between">
+      <div className="flex justify-between items-center">
         <h1
           onClick={navigateToNotesView}
           className="text-2xl font-medium cursor-pointer"
@@ -30,17 +35,21 @@ function Header() {
           Notes
         </h1>
         <div className="space-x-2">
-          <button
-            onClick={toggleAddMode}
-            className={`${
-              addMode && `hidden`
-            } fixed bottom-10 right-5 sm:static bg-gray-200 px-2 py-2 cursor-pointer hover:bg-gray-300 transition duration-300`}
-          >
-            + New Note
-          </button>
-          <button className="bg-gray-200 px-2 py-2 cursor-pointer hover:bg-gray-300 transition duration-300">
-            View
-          </button>
+          {currentViewIndex === 0 && (
+            <>
+              <button
+                onClick={toggleAddMode}
+                className={`${
+                  addMode && `hidden`
+                } fixed bottom-10 right-5 sm:static bg-gray-200 px-2 py-2 cursor-pointer hover:bg-gray-300 transition duration-300`}
+              >
+                + New Note
+              </button>
+              <button className="bg-gray-200 px-2 py-2 cursor-pointer hover:bg-gray-300 transition duration-300">
+                View
+              </button>
+            </>
+          )}
           <button className="bg-gray-200 px-2 py-2 cursor-pointer hover:bg-gray-300 transition duration-300">
             Theme
           </button>
