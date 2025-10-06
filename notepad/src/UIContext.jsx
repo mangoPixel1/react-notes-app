@@ -1,4 +1,10 @@
-import { useState, useEffect, createContext } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useContext,
+  createContext,
+} from "react";
 
 // Components
 import NotesView from "./components/NotesView";
@@ -35,4 +41,16 @@ export function UIProvider({ children }) {
       {children}
     </UIContext.Provider>
   );
+}
+
+// Custom hook to change view to NotesView
+export function useNavigateToNotesView() {
+  const { setCurrentNoteID, setCurrentViewIndex } = useContext(UIContext);
+
+  const navigateToNotesView = useCallback(() => {
+    setCurrentNoteID(null);
+    setCurrentViewIndex(0); // set to NotesView
+  }, [setCurrentNoteID, setCurrentViewIndex]);
+
+  return navigateToNotesView;
 }

@@ -1,5 +1,7 @@
 import { useContext } from "react";
-import { UIContext } from "../UIContext";
+
+// Contexts
+import { UIContext, useNavigateToNotesView } from "../UIContext";
 
 function Header() {
   const {
@@ -10,10 +12,7 @@ function Header() {
     setAddMode,
   } = useContext(UIContext);
 
-  function navigateToNotesView() {
-    setCurrentNoteID(null);
-    setCurrentViewIndex(0); // set to NotesView
-  }
+  const navigateToNotesView = useNavigateToNotesView();
 
   function toggleAddMode() {
     if (!addMode) {
