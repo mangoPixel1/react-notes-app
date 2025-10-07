@@ -102,7 +102,7 @@ export function NotesProvider({ children }) {
     });
   }
 
-  function editNote() {}
+  function editNote(title, body, lastUpdate) {}
 
   return (
     <NotesContext.Provider

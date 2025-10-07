@@ -43,10 +43,10 @@ function NoteCard({ id, title, body, color, creationDate, lastEdited }) {
   // Click on title triggers single note view
 
   return (
-    <div className={`p-3 border border-${color}-400 bg-${color}-100`}>
+    <div className={`p-3 border-2 border-${color}-400 bg-${color}-100`}>
       <h1
         onClick={navigateToSingleNoteView}
-        className="font-medium text-xl cursor-pointer hover:underline"
+        className="font-semibold text-xl cursor-pointer hover:underline"
       >
         {title}
       </h1>
