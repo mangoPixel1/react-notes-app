@@ -70,6 +70,27 @@ function notesReducer(state, action) {
       };
       return { ...state, notesList: [...state.notesList, noteObj] };
 
+    case "EDIT_NOTE":
+      const newEditDate = new Date();
+      const { id, title, body } = action.payload;
+
+      const trimmedTitle = title.trim();
+      const trimmedBody = body.trim();
+
+      if (!trimmedTitle && !trimmedBody) return state;
+
+      const updatedNotes = state.notesList.map((note) =>
+        note.id === id
+          ? {
+              ...note,
+              lastEdited: newEditDate,
+              title: trimmedTitle,
+              body: trimmedBody,
+            }
+          : note
+      );
+      return { ...state, notesList: updatedNotes };
+
     case "DELETE_NOTE":
       return {
         ...state,
@@ -102,13 +123,23 @@ export function NotesProvider({ children }) {
     });
   }
 
-  function editNote(title, body, lastUpdate) {}
+  function editNote(id, title, body) {
+    dispatch({
+      type: "EDIT_NOTE",
+      payload: {
+        id: id,
+        title: title,
+        body: body,
+      },
+    });
+  }
 
   return (
     <NotesContext.Provider
       value={{
         notes: state.notesList,
         addNote,
+        editNote,
         removeNote,
       }}
     >

@@ -1,31 +1,73 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 
 // Context
 import { NotesContext } from "../NotesContext";
 import { useNavigateToNotesView } from "../UIContext";
 
 function SingleNoteView({ id }) {
-  const { notes } = useContext(NotesContext);
+  const { notes, editNote } = useContext(NotesContext);
   const navigateToNotesView = useNavigateToNotesView();
 
-  // refactor for better error handling
+  // refactor for better error handling/boundary?
   const [note, setNote] = useState(() => {
     const currentNote = notes.find((note) => note.id === id);
     return currentNote ? currentNote : null;
   });
 
   const [editMode, setEditMode] = useState(false);
-  const [editTitle, setEditTitle] = useState(note.title);
-  const [editBody, setEditBody] = useState(note.body);
+  const [editTitle, setEditTitle] = useState("");
+  const [editBody, setEditBody] = useState("");
+
+  // True when note has been modified in edit mode
+  const [noteModified, setNoteModified] = useState(false);
 
   function handleSaveChanges() {
-    // editNote(title, body, lastUpdate)
+    if (noteModified) {
+      editNote(note.id, editTitle, editBody);
+    }
+    // Reset state
+    setNoteModified(false);
+    setEditMode(false);
+  }
+
+  function handleCancelChanges() {
+    // Reset state
+    setEditTitle(note.title);
+    setEditBody(note.body);
+    setNoteModified(false);
+    setEditMode(false);
   }
 
   function handleDeleteNote() {
     // removeNote()
     // navigate to NotesView
   }
+
+  // Detects when the note has been modified
+  useEffect(() => {
+    if (editMode && (note.title !== editTitle || note.body !== editBody)) {
+      setNoteModified(true);
+    }
+  }, [editTitle, editBody]);
+
+  // Detects when note has been updated
+  useEffect(() => {
+    const updatedNote = notes.find((n) => n.id === id);
+
+    if (updatedNote) {
+      setNote(updatedNote);
+      setEditTitle(updatedNote.title);
+      setEditBody(updatedNote.body);
+    }
+  }, [notes, id]);
+
+  // Initializes edit field values
+  useEffect(() => {
+    if (note) {
+      setEditTitle(note.title);
+      setEditBody(note.body);
+    }
+  }, [note]);
 
   const months = [
     "Jan",
@@ -58,10 +100,7 @@ function SingleNoteView({ id }) {
               <button onClick={handleSaveChanges} className="cursor-pointer">
                 Save
               </button>
-              <button
-                onClick={() => setEditMode(false)}
-                className="cursor-pointer"
-              >
+              <button onClick={handleCancelChanges} className="cursor-pointer">
                 Cancel
               </button>
               <button className="cursor-pointer text-red-600 hover:text-red-700">
