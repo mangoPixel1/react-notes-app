@@ -5,7 +5,7 @@ import { NotesContext } from "../NotesContext";
 import { useNavigateToNotesView } from "../UIContext";
 
 function SingleNoteView({ id }) {
-  const { notes, editNote } = useContext(NotesContext);
+  const { notes, editNote, removeNote } = useContext(NotesContext);
   const navigateToNotesView = useNavigateToNotesView();
 
   // refactor for better error handling/boundary?
@@ -39,8 +39,9 @@ function SingleNoteView({ id }) {
   }
 
   function handleDeleteNote() {
-    // removeNote()
-    // navigate to NotesView
+    console.log("deleting note...");
+    removeNote(id);
+    navigateToNotesView();
   }
 
   // Detects when the note has been modified
@@ -86,9 +87,16 @@ function SingleNoteView({ id }) {
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   function formatDateStr(date) {
-    return `${days[date.getDay()]}, ${
-      months[date.getMonth()]
-    } ${date.getDate()}, ${date.getFullYear()}`;
+    const day = days[date.getDay()];
+    const month = months[date.getMonth()];
+    const dateNum = date.getDate();
+    const year = date.getFullYear();
+    const hour = date.getHours();
+    const minutes = date.getMinutes();
+
+    return `${day}, ${month} ${dateNum}, ${year} at ${hour
+      .toString()
+      .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
   }
 
   return (
@@ -102,9 +110,6 @@ function SingleNoteView({ id }) {
               </button>
               <button onClick={handleCancelChanges} className="cursor-pointer">
                 Cancel
-              </button>
-              <button className="cursor-pointer text-red-600 hover:text-red-700">
-                Delete
               </button>
             </div>
           </div>
@@ -145,7 +150,10 @@ function SingleNoteView({ id }) {
               >
                 Edit
               </button>
-              <button className="cursor-pointer text-red-600 hover:text-red-700">
+              <button
+                onClick={handleDeleteNote}
+                className="cursor-pointer text-red-600 hover:text-red-700"
+              >
                 Delete
               </button>
             </div>
@@ -158,6 +166,9 @@ function SingleNoteView({ id }) {
             <p>{note.body}</p>
             <p className="mt-5 text-sm text-gray-500 italic">{`Created: ${formatDateStr(
               note.creationDate
+            )}`}</p>
+            <p className="mt-2 text-sm text-gray-500 italic">{`Modified: ${formatDateStr(
+              note.lastEdited
             )}`}</p>
           </div>
         </>

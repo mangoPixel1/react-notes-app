@@ -56,11 +56,8 @@ function NoteCard({ id, title, body, color, creationDate, lastEdited }) {
           creationDate
         )}`}</p>
         <div className="flex gap-2">
-          <button className="text-gray-600 hover:text-gray-700 cursor-pointer">
-            Edit
-          </button>
           <button
-            onClick={handleRemoveNote}
+            onClick={() => removeNote(id)}
             className="text-red-600 hover:text-red-700 cursor-pointer"
           >
             Delete
