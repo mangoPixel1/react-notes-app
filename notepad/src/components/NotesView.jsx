@@ -12,6 +12,14 @@ function NotesView() {
   const { addMode, setAddMode } = useContext(UIContext);
   const { notes, addNote } = useContext(NotesContext);
   const colorOptions = ["yellow", "red", "green", "orange", "blue", "gray"];
+  const colorSortOrder = {
+    red: 0,
+    orange: 1,
+    yellow: 2,
+    green: 3,
+    blue: 4,
+    gray: 5,
+  };
 
   const [newNoteData, setNewNoteData] = useState({
     title: "",
@@ -19,6 +27,12 @@ function NotesView() {
     color: "",
   });
 
+  const [sortOption, setSortOption] = useState("date-created-newest");
+  const [sortedNotes, setSortedNotes] = useState(
+    [...notes].sort(
+      (a, b) => new Date(b.creationDate) - new Date(a.creationDate)
+    )
+  );
   const [error, setError] = useState("");
 
   function handleAddNote(e) {
@@ -61,6 +75,54 @@ function NotesView() {
       setError("");
     }
   }
+
+  useEffect(() => {
+    switch (sortOption) {
+      case "date-created-newest":
+        setSortedNotes(
+          [...notes].sort(
+            (a, b) => new Date(b.creationDate) - new Date(a.creationDate)
+          )
+        );
+        break;
+
+      case "date-created-oldest":
+        setSortedNotes(
+          [...notes].sort(
+            (a, b) => new Date(a.creationDate) - new Date(b.creationDate)
+          )
+        );
+        break;
+
+      case "last-edited-newest":
+        setSortedNotes(
+          [...notes].sort(
+            (a, b) => new Date(b.lastEdited) - new Date(a.lastEdited)
+          )
+        );
+        break;
+
+      case "last-edited-oldest":
+        setSortedNotes(
+          [...notes].sort(
+            (a, b) => new Date(a.lastEdited) - new Date(b.lastEdited)
+          )
+        );
+        break;
+
+      case "color":
+        setSortedNotes(
+          [...notes].sort(
+            (a, b) => colorSortOrder[a.color] - colorSortOrder[b.color]
+          )
+        );
+        break;
+      default:
+        console.log("default sorting option");
+        setSortedNotes([...notes]);
+        break;
+    }
+  }, [notes, sortOption]);
 
   return (
     <div className="mt-8">
@@ -148,15 +210,21 @@ function NotesView() {
         <label htmlFor="sortBy" className="mr-2">
           Sort by
         </label>
-        <select name="sortBy" id="sortBy">
+        <select
+          value={sortOption}
+          onChange={(e) => setSortOption(e.target.value)}
+          name="sortBy"
+          id="sortBy"
+        >
           <option value="date-created-newest">{`Date Created (Newest)`}</option>
           <option value="date-created-oldest">{`Date Created (Oldest)`}</option>
-          <option value="last-edited">Last Edited</option>
+          <option value="last-edited-newest">{`Last Edited (Newest)`}</option>
+          <option value="last-edited-oldest">{`Last Edited (Oldest)`}</option>
           <option value="color">Color</option>
         </select>
       </div>
       <div className="space-y-4">
-        {notes.map((note) => (
+        {sortedNotes.map((note) => (
           <NoteCard
             key={note.id}
             id={note.id}
