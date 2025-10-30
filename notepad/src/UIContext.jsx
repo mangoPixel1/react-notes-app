@@ -13,6 +13,10 @@ import SingleNoteView from "./components/SingleNoteView";
 export const UIContext = createContext();
 
 export function UIProvider({ children }) {
+  // Color theme of UI
+  const [isDark, setIsDark] = useState(false);
+
+  // The view to display on main section of app
   const views = [NotesView, SingleNoteView];
   const [currentViewIndex, setCurrentViewIndex] = useState(0); // set to NotesView by default
 
@@ -29,6 +33,8 @@ export function UIProvider({ children }) {
   return (
     <UIContext.Provider
       value={{
+        isDark,
+        setIsDark,
         views,
         currentViewIndex,
         setCurrentViewIndex,
