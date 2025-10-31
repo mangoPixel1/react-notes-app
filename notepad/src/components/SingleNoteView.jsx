@@ -2,11 +2,13 @@ import { useContext, useState, useEffect } from "react";
 
 // Context
 import { NotesContext } from "../NotesContext";
-import { useNavigateToNotesView } from "../UIContext";
+import { UIContext, useNavigateToNotesView } from "../UIContext";
 
 function SingleNoteView({ id }) {
   const { notes, editNote, removeNote } = useContext(NotesContext);
   const navigateToNotesView = useNavigateToNotesView();
+
+  const { isDark } = useContext(UIContext);
 
   // refactor for better error handling/boundary?
   const [note, setNote] = useState(() => {
@@ -70,6 +72,27 @@ function SingleNoteView({ id }) {
     }
   }, [note]);
 
+  const colorMap = {
+    yellow: isDark
+      ? "mt-3 p-3 border-2 border-yellow-400 bg-yellow-100 bg-zinc-700"
+      : "mt-3 p-3 border-2 border-yellow-400 bg-yellow-100",
+    red: isDark
+      ? "mt-3 p-3 border-2 border-red-400 bg-red-100 bg-zinc-700"
+      : "mt-3 p-3 border-2 border-red-400 bg-red-100",
+    green: isDark
+      ? "mt-3 p-3 border-2 border-green-400 bg-green-100 bg-zinc-700"
+      : "mt-3 p-3 border-2 border-green-400 bg-green-100",
+    orange: isDark
+      ? "mt-3 p-3 border-2 border-orange-400 bg-orange-100 bg-zinc-700"
+      : "mt-3 p-3 border-2 border-orange-400 bg-orange-100",
+    blue: isDark
+      ? "mt-3 p-3 border-2 border-blue-400 bg-blue-100 bg-zinc-700"
+      : "mt-3 p-3 border-2 border-blue-400 bg-blue-100",
+    gray: isDark
+      ? "mt-3 p-3 border-2 border-gray-400 bg-gray-100 bg-zinc-700"
+      : "mt-3 p-3 border-2 border-gray-400 bg-gray-100",
+  };
+
   const months = [
     "Jan",
     "Feb",
@@ -113,9 +136,7 @@ function SingleNoteView({ id }) {
               </button>
             </div>
           </div>
-          <div
-            className={`mt-3 p-3 border-2 border-${note.color}-400 bg-${note.color}-100`}
-          >
+          <div className={colorMap[note.color]}>
             <form className="space-y-2">
               <input
                 id="note-title"
@@ -159,9 +180,7 @@ function SingleNoteView({ id }) {
             </div>
           </div>
 
-          <div
-            className={`mt-3 p-3 border-2 border-${note.color}-400 bg-${note.color}-100`}
-          >
+          <div className={colorMap[note.color]}>
             <h1 className="text-xl font-semibold">{note.title}</h1>
             <p>{note.body}</p>
             <p className="mt-5 text-sm text-gray-500 italic">{`Created: ${formatDateStr(

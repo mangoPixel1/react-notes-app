@@ -5,7 +5,7 @@ import { UIContext } from "../UIContext";
 import { NotesContext } from "../NotesContext";
 
 function NoteCard({ id, title, body, color, creationDate, lastEdited }) {
-  const { currentViewIndex, setCurrentViewIndex, setCurrentNoteID } =
+  const { isDark, currentViewIndex, setCurrentViewIndex, setCurrentNoteID } =
     useContext(UIContext);
   const { removeNote } = useContext(NotesContext);
 
@@ -17,6 +17,27 @@ function NoteCard({ id, title, body, color, creationDate, lastEdited }) {
   function handleRemoveNote() {
     removeNote(id);
   }
+
+  const colorMap = {
+    yellow: isDark
+      ? "p-3 border border-2 border-yellow-400 bg-zinc-700"
+      : "p-3 border border-2 border-yellow-400 bg-yellow-100",
+    red: isDark
+      ? "p-3 border border-2 border-red-400 bg-zinc-700"
+      : "p-3 border border-red-400 bg-red-100",
+    green: isDark
+      ? "p-3 border border-2 border-green-400 bg-zinc-700"
+      : "p-3 border border-green-400 bg-green-100",
+    orange: isDark
+      ? "p-3 border border-2 border-orange-400 bg-zinc-700"
+      : "p-3 border border-orange-400 bg-orange-100",
+    blue: isDark
+      ? "p-3 border border-2 border-blue-400 bg-zinc-700"
+      : "p-3 border border-blue-400 bg-blue-100",
+    gray: isDark
+      ? "p-3 border border-2 border-gray-400 bg-zinc-700"
+      : "p-3 border border-gray-400 bg-gray-100",
+  };
 
   const months = [
     "Jan",
@@ -43,7 +64,7 @@ function NoteCard({ id, title, body, color, creationDate, lastEdited }) {
   // Click on title triggers single note view
 
   return (
-    <div className={`p-3 border-2 border-${color}-400 bg-${color}-100`}>
+    <div className={colorMap[color]}>
       <h1
         onClick={navigateToSingleNoteView}
         className="font-semibold text-xl cursor-pointer hover:underline"

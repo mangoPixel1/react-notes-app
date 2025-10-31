@@ -42,19 +42,19 @@ function Header() {
                 onClick={toggleAddMode}
                 className={`${
                   addMode && `hidden`
-                } fixed bottom-10 right-5 sm:static bg-gray-200 px-2 py-2 cursor-pointer hover:bg-gray-300 transition duration-300`}
+                } fixed bottom-10 right-5 sm:static bg-gray-200 px-2 py-2 cursor-pointer hover:bg-gray-300 transition duration-300 dark:bg-zinc-600 dark:hover:bg-zinc-700`}
               >
                 + New Note
               </button>
-              <button
-                onClick={() => setIsDark(!isDark)}
-                className="bg-gray-200 px-2 py-2 cursor-pointer hover:bg-gray-300 transition duration-300"
-              >
+              <button className="bg-gray-200 px-2 py-2 cursor-pointer hover:bg-gray-300 transition duration-300 dark:bg-zinc-600 dark:hover:bg-zinc-700">
                 View
               </button>
             </>
           )}
-          <button className="bg-gray-200 px-2 py-2 cursor-pointer hover:bg-gray-300 transition duration-300">
+          <button
+            onClick={() => setIsDark(!isDark)}
+            className="bg-gray-200 px-2 py-2 cursor-pointer hover:bg-gray-300 transition duration-300 dark:bg-zinc-600 dark:hover:bg-zinc-700"
+          >
             Theme
           </button>
         </div>

@@ -23,7 +23,7 @@ export function UIProvider({ children }) {
   // ID of note to display in SingleNoteView
   const [currentNoteID, setCurrentNoteID] = useState();
 
-  // Visibility state of add new note form in NotesView. Accessible in Header and NotesView
+  // Visibility state of "add New Note" form in NotesView. Accessible in Header and NotesView
   const [addMode, setAddMode] = useState(false);
 
   useEffect(() => {
