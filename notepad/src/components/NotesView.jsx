@@ -192,13 +192,13 @@ function NotesView() {
           <div className="flex gap-4">
             <button
               onClick={handleAddNote}
-              className="bg-gray-200 px-2 py-2 cursor-pointer hover:bg-gray-300 transition duration-300"
+              className="px-2 py-2 cursor-pointer bg-gray-200 hover:bg-gray-300 dark:bg-zinc-600 dark:hover:bg-zinc-700 transition duration-300"
             >
               Add Note
             </button>
             <button
               onClick={handleCancelNote}
-              className="bg-gray-200 px-2 py-2 cursor-pointer hover:bg-gray-300 transition duration-300"
+              className="px-2 py-2 cursor-pointer bg-gray-200 hover:bg-gray-300 dark:bg-zinc-600 dark:hover:bg-zinc-700 transition duration-300"
             >
               Cancel
             </button>

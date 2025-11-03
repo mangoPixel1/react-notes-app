@@ -27,6 +27,17 @@ export function UIProvider({ children }) {
   const [addMode, setAddMode] = useState(false);
 
   useEffect(() => {
+    const body = document.body;
+    if (isDark) {
+      body.classList.add("bg-zinc-800");
+      body.classList.remove("bg-gray-50");
+    } else {
+      body.classList.add("bg-gray-50");
+      body.classList.remove("bg-zinc-800");
+    }
+  }, [isDark]);
+
+  useEffect(() => {
     setAddMode(false);
   }, [currentViewIndex]);
 
