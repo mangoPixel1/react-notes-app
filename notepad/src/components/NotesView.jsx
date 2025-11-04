@@ -9,7 +9,7 @@ import Search from "./Search";
 import NoteCard from "./NoteCard";
 
 function NotesView() {
-  const { addMode, setAddMode } = useContext(UIContext);
+  const { notesLayout, addMode, setAddMode } = useContext(UIContext);
   const { notes, addNote } = useContext(NotesContext);
   const colorOptions = ["yellow", "red", "green", "orange", "blue", "gray"];
   const colorSortOrder = {
@@ -223,7 +223,13 @@ function NotesView() {
           <option value="color">Color</option>
         </select>
       </div>
-      <div className="space-y-4">
+      <div
+        className={`${
+          notesLayout === "grid"
+            ? `grid grid-cols-2 sm:grid-cols-3 gap-2`
+            : `space-y-4`
+        }`}
+      >
         {sortedNotes.map((note) => (
           <NoteCard
             key={note.id}

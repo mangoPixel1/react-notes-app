@@ -23,6 +23,9 @@ export function UIProvider({ children }) {
   // ID of note to display in SingleNoteView
   const [currentNoteID, setCurrentNoteID] = useState();
 
+  // Layout of NotesView (default: list)
+  const [notesLayout, setNotesLayout] = useState("list");
+
   // Visibility state of "add New Note" form in NotesView. Accessible in Header and NotesView
   const [addMode, setAddMode] = useState(false);
 
@@ -51,6 +54,8 @@ export function UIProvider({ children }) {
         setCurrentViewIndex,
         currentNoteID,
         setCurrentNoteID,
+        notesLayout,
+        setNotesLayout,
         addMode,
         setAddMode,
       }}

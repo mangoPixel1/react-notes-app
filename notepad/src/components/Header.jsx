@@ -10,6 +10,8 @@ function Header() {
     currentViewIndex,
     setCurrentViewIndex,
     setCurrentNoteID,
+    notesLayout,
+    setNotesLayout,
     addMode,
     setAddMode,
   } = useContext(UIContext);
@@ -20,6 +22,10 @@ function Header() {
     if (!addMode) {
       setAddMode(true);
     }
+  }
+
+  function toggleLayoutView() {
+    notesLayout === "list" ? setNotesLayout("grid") : setNotesLayout("list");
   }
 
   function toggleView() {
@@ -46,8 +52,11 @@ function Header() {
               >
                 + New Note
               </button>
-              <button className="bg-gray-200 px-2 py-2 cursor-pointer hover:bg-gray-300 transition duration-300 dark:bg-zinc-600 dark:hover:bg-zinc-700">
-                View
+              <button
+                onClick={toggleLayoutView}
+                className="bg-gray-200 px-2 py-2 cursor-pointer hover:bg-gray-300 transition duration-300 dark:bg-zinc-600 dark:hover:bg-zinc-700"
+              >
+                {`${notesLayout === "list" ? `Grid View` : `List View`}`}
               </button>
             </>
           )}
