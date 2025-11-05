@@ -11,6 +11,30 @@ import NoteCard from "./NoteCard";
 function NotesView() {
   const { notesLayout, addMode, setAddMode } = useContext(UIContext);
   const { notes, addNote } = useContext(NotesContext);
+
+  // add to UIContext: to persist search value and results
+  const [searchValue, setSearchValue] = useState(""); // the value of search input
+  const [searchResults, setSearchResults] = useState(null); // the notes to render from searching
+
+  function handleSearchInputChange(e) {
+    const searchTerm = e.target.value;
+    if (searchTerm === "") {
+      setSearchValue("");
+      setSearchResults(null);
+      return;
+    }
+    setSearchValue(searchTerm);
+
+    // set to notes and deal with sortedNotes
+    const filteredNotes = notes.filter(
+      (note) =>
+        note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        note.body.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    setSearchResults(filteredNotes);
+  }
+
   const colorOptions = ["yellow", "red", "green", "orange", "blue", "gray"];
   const colorSortOrder = {
     red: 0,
@@ -126,7 +150,10 @@ function NotesView() {
 
   return (
     <div className="mt-8">
-      <Search />
+      <Search
+        searchValue={searchValue}
+        handleInputChange={handleSearchInputChange}
+      />
 
       {addMode && (
         <form className="my-8">
@@ -206,23 +233,26 @@ function NotesView() {
         </form>
       )}
 
-      <div className="my-3">
-        <label htmlFor="sortBy" className="mr-2">
-          Sort by
-        </label>
-        <select
-          value={sortOption}
-          onChange={(e) => setSortOption(e.target.value)}
-          name="sortBy"
-          id="sortBy"
-        >
-          <option value="date-created-newest">{`Date Created (Newest)`}</option>
-          <option value="date-created-oldest">{`Date Created (Oldest)`}</option>
-          <option value="last-edited-newest">{`Last Edited (Newest)`}</option>
-          <option value="last-edited-oldest">{`Last Edited (Oldest)`}</option>
-          <option value="color">Color</option>
-        </select>
-      </div>
+      {!searchResults && (
+        <div className="my-3">
+          <label htmlFor="sortBy" className="mr-2">
+            Sort by
+          </label>
+          <select
+            value={sortOption}
+            onChange={(e) => setSortOption(e.target.value)}
+            name="sortBy"
+            id="sortBy"
+          >
+            <option value="date-created-newest">{`Date Created (Newest)`}</option>
+            <option value="date-created-oldest">{`Date Created (Oldest)`}</option>
+            <option value="last-edited-newest">{`Last Edited (Newest)`}</option>
+            <option value="last-edited-oldest">{`Last Edited (Oldest)`}</option>
+            <option value="color">Color</option>
+          </select>
+        </div>
+      )}
+
       <div
         className={`${
           notesLayout === "grid"
@@ -230,17 +260,29 @@ function NotesView() {
             : `space-y-4`
         }`}
       >
-        {sortedNotes.map((note) => (
-          <NoteCard
-            key={note.id}
-            id={note.id}
-            title={note.title}
-            body={note.body}
-            creationDate={note.creationDate}
-            lastEdited={note.lastEdited}
-            color={note.color}
-          />
-        ))}
+        {searchResults
+          ? searchResults.map((note) => (
+              <NoteCard
+                key={note.id}
+                id={note.id}
+                title={note.title}
+                body={note.body}
+                creationDate={note.creationDate}
+                lastEdited={note.lastEdited}
+                color={note.color}
+              />
+            ))
+          : sortedNotes.map((note) => (
+              <NoteCard
+                key={note.id}
+                id={note.id}
+                title={note.title}
+                body={note.body}
+                creationDate={note.creationDate}
+                lastEdited={note.lastEdited}
+                color={note.color}
+              />
+            ))}
       </div>
     </div>
   );
