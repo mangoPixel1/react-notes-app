@@ -90,22 +90,3 @@ function NoteCard({ id, title, body, color, creationDate, lastEdited }) {
 }
 
 export default NoteCard;
-
-/* 
-<span className="text-sm text-gray-500 italic">{`Last edited: ${formatDateStr(
-        lastEdited
-      )}`}</span>
-*/
-
-/*
-const colorOptions = ["yellow", "red", "green", "orange", "blue", "gray"];
-
-  const colorStyles = {
-    yellow: "p-3 border border-yellow-400 bg-yellow-100",
-    red: "p-3 border border-red-400 bg-red-100",
-    green: "p-3 border border-green-400 bg-green-100",
-    orange: "p-3 border border-orange-400 bg-orange-100",
-    blue: "p-3 border border-blue-400 bg-blue-100",
-    gray: "p-3 border border-gray-400 bg-gray-100",
-  };
-*/
