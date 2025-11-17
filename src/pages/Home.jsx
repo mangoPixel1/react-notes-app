@@ -1,14 +1,14 @@
 import { useState, useContext, useEffect } from "react";
 
 // Contexts
-import { UIContext } from "../UIContext";
-import { NotesContext } from "../NotesContext";
+import { UIContext } from "../contexts/UIContext";
+import { NotesContext } from "../contexts/NotesContext";
 
 // Components
-import Search from "./Search";
-import NoteCard from "./NoteCard";
+import Search from "../components/Search";
+import NoteCard from "../components/NoteCard";
 
-function NotesView() {
+function Home() {
   const { notesLayout, addMode, setAddMode } = useContext(UIContext);
   const { notes, addNote } = useContext(NotesContext);
 
@@ -288,4 +288,4 @@ function NotesView() {
   );
 }
 
-export default NotesView;
+export default Home;

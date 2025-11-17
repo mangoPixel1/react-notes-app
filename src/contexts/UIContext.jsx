@@ -6,22 +6,11 @@ import {
   createContext,
 } from "react";
 
-// Components
-import NotesView from "./components/NotesView";
-import SingleNoteView from "./components/SingleNoteView";
-
 export const UIContext = createContext();
 
 export function UIProvider({ children }) {
   // Color theme of UI
   const [isDark, setIsDark] = useState(false);
-
-  // The view to display on main section of app
-  const views = [NotesView, SingleNoteView];
-  const [currentViewIndex, setCurrentViewIndex] = useState(0); // set to NotesView by default
-
-  // ID of note to display in SingleNoteView
-  const [currentNoteID, setCurrentNoteID] = useState();
 
   // Layout of NotesView (default: list)
   const [notesLayout, setNotesLayout] = useState("list");
@@ -40,20 +29,11 @@ export function UIProvider({ children }) {
     }
   }, [isDark]);
 
-  useEffect(() => {
-    setAddMode(false);
-  }, [currentViewIndex]);
-
   return (
     <UIContext.Provider
       value={{
         isDark,
         setIsDark,
-        views,
-        currentViewIndex,
-        setCurrentViewIndex,
-        currentNoteID,
-        setCurrentNoteID,
         notesLayout,
         setNotesLayout,
         addMode,

@@ -1,12 +1,14 @@
 import { useContext, useState, useEffect } from "react";
 
 // Context
-import { NotesContext } from "../NotesContext";
-import { UIContext, useNavigateToNotesView } from "../UIContext";
+import { NotesContext } from "../contexts/NotesContext";
+import { UIContext } from "../contexts/UIContext";
+import { Link, useParams } from "react-router";
 
-function SingleNoteView({ id }) {
+function Note() {
+  const { id } = useParams();
+
   const { notes, editNote, removeNote } = useContext(NotesContext);
-  const navigateToNotesView = useNavigateToNotesView();
 
   const { isDark } = useContext(UIContext);
 
@@ -158,12 +160,12 @@ function SingleNoteView({ id }) {
       ) : (
         <>
           <div className="flex justify-between">
-            <button
-              onClick={navigateToNotesView}
-              className="cursor-pointer hover:underline"
-            >
-              Back to notes
-            </button>
+            <Link to="/">
+              <button className="cursor-pointer hover:underline">
+                Back to notes
+              </button>
+            </Link>
+
             <div className="space-x-2">
               <button
                 onClick={() => setEditMode(true)}
@@ -196,4 +198,4 @@ function SingleNoteView({ id }) {
   );
 }
 
-export default SingleNoteView;
+export default Note;

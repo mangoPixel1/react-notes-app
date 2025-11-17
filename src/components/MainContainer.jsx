@@ -1,11 +1,13 @@
 import { useContext } from "react";
+import { Routes, Route } from "react-router";
 
 // Contexts
-import { UIContext } from "../UIContext";
+import { UIContext } from "../contexts/UIContext";
 
 // Components
 import Header from "./Header";
-import View from "./View";
+import Home from "../pages/Home";
+import Note from "../pages/Note";
 
 function MainContainer() {
   const { isDark } = useContext(UIContext);
@@ -18,7 +20,10 @@ function MainContainer() {
     >
       <div className="w-full max-w-3xl ">
         <Header />
-        <View />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/note/:id" element={<Note />} />
+        </Routes>
       </div>
     </div>
   );

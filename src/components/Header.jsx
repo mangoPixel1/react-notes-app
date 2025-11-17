@@ -1,15 +1,16 @@
 import { useContext } from "react";
+import { Link, useLocation } from "react-router";
 
 // Contexts
-import { UIContext, useNavigateToNotesView } from "../UIContext";
+import { UIContext, useNavigateToNotesView } from "../contexts/UIContext";
 
 function Header() {
+  const location = useLocation();
+  const isHome = location.pathname === "/";
+
   const {
     isDark,
     setIsDark,
-    currentViewIndex,
-    setCurrentViewIndex,
-    setCurrentNoteID,
     notesLayout,
     setNotesLayout,
     addMode,
@@ -28,21 +29,20 @@ function Header() {
     notesLayout === "list" ? setNotesLayout("grid") : setNotesLayout("list");
   }
 
-  function toggleView() {
-    setCurrentViewIndex((prev) => (prev === 0 ? 1 : 0));
-  }
-
   return (
     <header className="space-y-4">
       <div className="flex justify-between items-center">
-        <h1
-          onClick={navigateToNotesView}
-          className="text-2xl font-medium cursor-pointer"
-        >
-          Notes
-        </h1>
+        <Link to="/">
+          <h1
+            onClick={navigateToNotesView}
+            className="text-2xl font-medium cursor-pointer"
+          >
+            Notes
+          </h1>
+        </Link>
+
         <div className="space-x-2">
-          {currentViewIndex === 0 && (
+          {isHome && (
             <>
               <button
                 onClick={toggleAddMode}

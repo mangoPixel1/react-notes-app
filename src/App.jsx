@@ -2,8 +2,8 @@ import { useContext, useState } from "react";
 import "./App.css";
 
 // Contexts
-import { UIProvider } from "./UIContext";
-import { NotesProvider } from "./NotesContext";
+import { UIProvider } from "./contexts/UIContext";
+import { NotesProvider } from "./contexts/NotesContext";
 
 // Components
 import MainContainer from "./components/MainContainer";

@@ -1,22 +1,14 @@
 import { useContext } from "react";
+import { Link } from "react-router";
 
 // Contexts
-import { UIContext } from "../UIContext";
-import { NotesContext } from "../NotesContext";
+import { UIContext } from "../contexts/UIContext";
+import { NotesContext } from "../contexts/NotesContext";
 
 function NoteCard({ id, title, body, color, creationDate, lastEdited }) {
   const { isDark, currentViewIndex, setCurrentViewIndex, setCurrentNoteID } =
     useContext(UIContext);
   const { removeNote } = useContext(NotesContext);
-
-  function navigateToSingleNoteView() {
-    setCurrentNoteID(id); // set current note to this note's id
-    setCurrentViewIndex(1); // set view to SingleNoteView
-  }
-
-  function handleRemoveNote() {
-    removeNote(id);
-  }
 
   const colorMap = {
     yellow: isDark
@@ -61,16 +53,14 @@ function NoteCard({ id, title, body, color, creationDate, lastEdited }) {
     } ${date.getDate()}, ${date.getFullYear()}`;
   }
 
-  // Click on title triggers single note view
-
   return (
     <div className={colorMap[color]}>
-      <h1
-        onClick={navigateToSingleNoteView}
-        className="font-semibold text-xl cursor-pointer hover:underline"
-      >
-        {title}
-      </h1>
+      <Link to={`note/${id}`}>
+        <h1 className="font-semibold text-xl cursor-pointer hover:underline">
+          {title}
+        </h1>
+      </Link>
+
       <p className="mb-4">{body}</p>
       <div className="flex justify-between">
         <p className="text-sm text-gray-500 italic">{`Created: ${formatDateStr(
