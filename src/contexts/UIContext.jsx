@@ -44,15 +44,3 @@ export function UIProvider({ children }) {
     </UIContext.Provider>
   );
 }
-
-// Custom hook to change view to NotesView
-export function useNavigateToNotesView() {
-  const { setCurrentNoteID, setCurrentViewIndex } = useContext(UIContext);
-
-  const navigateToNotesView = useCallback(() => {
-    setCurrentNoteID(null);
-    setCurrentViewIndex(0); // set to NotesView
-  }, [setCurrentNoteID, setCurrentViewIndex]);
-
-  return navigateToNotesView;
-}

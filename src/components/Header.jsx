@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { Link, useLocation } from "react-router";
 
 // Contexts
-import { UIContext, useNavigateToNotesView } from "../contexts/UIContext";
+import { UIContext } from "../contexts/UIContext";
 
 function Header() {
   const location = useLocation();
@@ -16,8 +16,6 @@ function Header() {
     addMode,
     setAddMode,
   } = useContext(UIContext);
-
-  const navigateToNotesView = useNavigateToNotesView();
 
   function toggleAddMode() {
     if (!addMode) {
@@ -33,12 +31,7 @@ function Header() {
     <header className="space-y-4">
       <div className="flex justify-between items-center">
         <Link to="/">
-          <h1
-            onClick={navigateToNotesView}
-            className="text-2xl font-medium cursor-pointer"
-          >
-            Notes
-          </h1>
+          <h1 className="text-2xl font-medium cursor-pointer">Notes</h1>
         </Link>
 
         <div className="space-x-2">
