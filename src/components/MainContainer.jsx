@@ -23,6 +23,28 @@ function MainContainer() {
         isDark && "dark"
       } bg-gray-50 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition duration-300 flex justify-center p-5 sm:px-10`}
     >
+      <div className="w-full flex justify-center">
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route element={<AppLayout />}>
+            <Route path="/dashboard" element={<Home />} />
+            <Route path="/note/:id" element={<Note />} />
+          </Route>
+        </Routes>
+      </div>
+    </div>
+  );
+}
+
+export default MainContainer;
+
+/* 
+return (
+    <div
+      className={`${
+        isDark && "dark"
+      } bg-gray-50 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition duration-300 flex justify-center p-5 sm:px-10`}
+    >
       <div className="w-full max-w-3xl">
         <Routes>
           <Route element={<LandingLayout />}>
@@ -36,6 +58,5 @@ function MainContainer() {
       </div>
     </div>
   );
-}
 
-export default MainContainer;
+*/
