@@ -160,7 +160,7 @@ function Note() {
       ) : (
         <>
           <div className="flex justify-between">
-            <Link to="/">
+            <Link to="/dashboard">
               <button className="cursor-pointer hover:underline">
                 Back to notes
               </button>
