@@ -78,7 +78,7 @@ function Landing() {
           </svg>
         </button>
         {isMenuOpen && (
-          <nav className="absolute right-0 top-full bg-white p-5 rounded-md drop-shadow-md text-sm md:hidden">
+          <nav className="absolute right-0 top-full bg-white p-5 rounded-md drop-shadow-lg/25 text-sm md:hidden">
             <div className="text-base space-y-4">
               <p className="cursor-pointer">Features</p>
               <p className="cursor-pointer">Pricing</p>
@@ -87,7 +87,10 @@ function Landing() {
             </div>
 
             <div className="flex justify-center items-center gap-4 px-5 border-t mt-5 pt-5 border-gray-300 text-base">
-              <p className="p2-2 cursor-pointer">Log In</p>
+              <Link to="/login">
+                <p className="p2-2 cursor-pointer">Log In</p>
+              </Link>
+
               <p className="p-2 rounded-sm border border-gray-400 hover:border-gray-500 cursor-pointer">
                 Sign Up
               </p>
@@ -104,7 +107,10 @@ function Landing() {
           </div>
 
           <div className="flex justify-center items-center gap-4 px-5 border-l border-gray-300">
-            <p className="p2-2 cursor-pointer">Log In</p>
+            <Link to="/login">
+              <p className="p2-2 cursor-pointer">Log In</p>
+            </Link>
+
             <p className="p-2 rounded-sm border border-gray-400 hover:border-gray-500 cursor-pointer">
               Sign Up
             </p>

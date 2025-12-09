@@ -13,6 +13,7 @@ import Header from "./Header";
 import Home from "../pages/Home";
 import Note from "../pages/Note";
 import Landing from "../pages/Landing";
+import Login from "../pages/Login";
 
 function MainContainer() {
   const { isDark } = useContext(UIContext);
@@ -26,6 +27,7 @@ function MainContainer() {
       <div className="w-full flex justify-center">
         <Routes>
           <Route path="/" element={<Landing />} />
+          <Route path="/login" element={<Login />} />
           <Route element={<AppLayout />}>
             <Route path="/dashboard" element={<Home />} />
             <Route path="dashboard/note/:id" element={<Note />} />
