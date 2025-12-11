@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
+import Logo from "../Icons";
 
 const featuresList = [
   {
@@ -52,7 +53,10 @@ function Landing() {
   return (
     <div className="flex flex-col justify-center items-center max-w-5xl w-full">
       <header className="relative w-full flex justify-between items-center">
-        <h3 className="text-2xl sm:text-3xl font-normal">📒 Notepad</h3>
+        <div className="flex items-center gap-2">
+          <Logo className="w-14 h-14 text-amber-500" />
+          <h3 className="text-2xl sm:text-2xl font-normal">Notepad</h3>
+        </div>
 
         <button
           className="cursor-pointer md:hidden"
@@ -91,9 +95,11 @@ function Landing() {
                 <p className="p2-2 cursor-pointer">Log In</p>
               </Link>
 
-              <p className="p-2 rounded-sm border border-gray-400 hover:border-gray-500 cursor-pointer">
-                Sign Up
-              </p>
+              <Link to="/signup">
+                <p className="p-2 rounded-sm border border-gray-400 hover:border-gray-500 cursor-pointer">
+                  Sign Up
+                </p>
+              </Link>
             </div>
           </nav>
         )}
@@ -110,10 +116,11 @@ function Landing() {
             <Link to="/login">
               <p className="p2-2 cursor-pointer">Log In</p>
             </Link>
-
-            <p className="p-2 rounded-sm border border-gray-400 hover:border-gray-500 cursor-pointer">
-              Sign Up
-            </p>
+            <Link to="/signup">
+              <p className="p-2 rounded-sm border border-gray-400 hover:border-gray-500 cursor-pointer">
+                Sign Up
+              </p>
+            </Link>
           </div>
         </nav>
       </header>
@@ -123,7 +130,7 @@ function Landing() {
           All your thoughts synced seamlessly across every device right from
           your favorite browser.
         </p>
-        <Link to="/dashboard">
+        <Link to="/signup">
           <button className="px-5 py-2 rounded-sm bg-amber-500 hover:bg-amber-600 transition duration-300 text-white cursor-pointer">
             Sign up now
           </button>
@@ -147,7 +154,8 @@ function Landing() {
       </div>
       <footer className="w-full mt-10 text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">
         <div className="max-w-3xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p className="tracking-tight">
+          <p className="flex items-center gap-1 tracking-tight">
+            <Logo className="w-6 h-6 text-amber-500" />
             <span className="font-semibold text-zinc-700 dark:text-zinc-100">
               Notepad
             </span>{" "}
