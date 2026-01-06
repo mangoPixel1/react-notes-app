@@ -1,6 +1,8 @@
 import React from "react";
 import { Link } from "react-router";
-import Logo from "../Icons";
+
+// Icons
+import Logo from "../icons/Logo";
 
 function Signup() {
   return (

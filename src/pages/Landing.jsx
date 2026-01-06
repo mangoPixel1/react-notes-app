@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import Logo from "../Icons";
+
+// Icons
+import Logo from "../icons/Logo";
 
 const featuresList = [
   {
