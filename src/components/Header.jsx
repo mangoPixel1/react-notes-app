@@ -37,7 +37,7 @@ function Header() {
   }
 
   return (
-    <header className="space-y-4">
+    <header className="px-6 py-3 space-y-4">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
           <Link to="/dashboard" className="flex items-center">

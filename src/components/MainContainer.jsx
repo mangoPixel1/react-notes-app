@@ -1,15 +1,11 @@
 import { useContext } from "react";
 import { Routes, Route } from "react-router";
-
-// Contexts
 import { UIContext } from "../contexts/UIContext";
 
 // Layouts
 import AppLayout from "../layouts/AppLayout";
-import LandingLayout from "../layouts/LandingLayout";
 
-// Components
-import Header from "./Header";
+// Pages
 import Home from "../pages/Home";
 import Note from "../pages/Note";
 import Landing from "../pages/Landing";
@@ -21,21 +17,21 @@ function MainContainer() {
 
   return (
     <div
-      className={`${
+      className={`min-h-screen ${
         isDark && "dark"
-      } bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition duration-300 flex justify-center p-5 sm:px-10`}
+      } bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition-colors duration-300`}
     >
-      <div className="w-full flex justify-center">
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route element={<AppLayout />}>
-            <Route path="/dashboard" element={<Home />} />
-            <Route path="dashboard/note/:id" element={<Note />} />
-          </Route>
-        </Routes>
-      </div>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+
+        {/* Dashboard */}
+        <Route element={<AppLayout />}>
+          <Route path="/dashboard" element={<Home />} />
+          <Route path="/dashboard/note/:id" element={<Note />} />
+        </Route>
+      </Routes>
     </div>
   );
 }

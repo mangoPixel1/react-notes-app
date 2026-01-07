@@ -53,7 +53,7 @@ function Landing() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <div className="flex flex-col justify-center items-center max-w-5xl w-full">
+    <div className="flex flex-col items-center max-w-5xl w-full mx-auto p-5">
       <header className="relative w-full flex justify-between items-center">
         <div className="flex items-center gap-2">
           <Logo className="w-14 h-14 text-amber-500" />
