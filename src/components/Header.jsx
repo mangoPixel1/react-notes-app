@@ -9,9 +9,7 @@ import Search from "./Search";
 
 // Icons
 import Logo from "../icons/Logo";
-import { Sun } from "lucide-react";
-import { Moon } from "lucide-react";
-import { RefreshCw } from "lucide-react";
+import { Sun, Moon, RefreshCw, CircleUserRound } from "lucide-react";
 
 function Header() {
   const location = useLocation();
@@ -47,7 +45,7 @@ function Header() {
           <Search />
         </div>
 
-        <div className="space-x-2">
+        <div className="flex gap-2">
           {isHome && (
             <>
               <button
@@ -68,6 +66,9 @@ function Header() {
             ) : (
               <Moon className="w-6 h-6 text-amber-500" />
             )}
+          </button>
+          <button className="px-2 py-2 rounded-4xl cursor-pointer hover:bg-gray-50 dark:hover:bg-orange-950 transition duration-300">
+            <CircleUserRound className="w-8 h-8 text-gray-500 dark:text-gray-400" />
           </button>
         </div>
       </div>
