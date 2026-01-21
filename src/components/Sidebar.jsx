@@ -1,5 +1,6 @@
 import { useContext, useState } from "react";
 import { UIContext } from "../contexts/UIContext";
+import { Link } from "react-router";
 import { Tooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
 
@@ -24,9 +25,11 @@ function Sidebar() {
   return (
     <>
       <aside
-        className={`shrink-0 bg-orange-200 dark:bg-amber-900 p-4 flex flex-col items-center gap-6
-          ${isExpanded ? "w-44 items-start" : "w-16"}
-        `}
+        className={`shrink-0 overflow-hidden bg-orange-200 dark:bg-amber-900 p-4
+  flex flex-col gap-6
+  transition-[width] duration-300 ease-in-out
+  ${isExpanded ? "w-44 items-start" : "w-16 items-center"}
+`}
       >
         <div
           className="p-3 hover:bg-orange-300 dark:hover:bg-amber-800 rounded-full transition cursor-pointer"
@@ -36,50 +39,55 @@ function Sidebar() {
         </div>
 
         <div className="w-full flex flex-col gap-3 items-center">
-          <div
+          <Link
+            to="/dashboard"
             {...tooltipProps}
             data-tooltip-content="Home"
-            className={`${isExpanded && "w-full"} p-3 flex gap-3 hover:bg-orange-300 dark:hover:bg-amber-800 rounded-full cursor-pointer`}
+            className={`${isExpanded && "w-full rounded-xl"} p-3 flex gap-3 hover:bg-orange-300 dark:hover:bg-amber-800 rounded-full cursor-pointer`}
           >
             <House className="w-6 h-6 text-amber-600" />
             {isExpanded && <span className="ml-2">Home</span>}
-          </div>
+          </Link>
 
-          <div
+          <Link
+            to="/folders"
             {...tooltipProps}
             data-tooltip-content="Folders"
-            className={`${isExpanded && "w-full"} p-3 flex gap-3 hover:bg-orange-300 dark:hover:bg-amber-800 rounded-full cursor-pointer`}
+            className={`${isExpanded && "w-full rounded-xl"} p-3 flex gap-3 hover:bg-orange-300 dark:hover:bg-amber-800 rounded-full cursor-pointer`}
           >
             <FolderClosed className="w-6 h-6 text-amber-600" />
             {isExpanded && <span className="ml-2">Folders</span>}
-          </div>
+          </Link>
 
-          <div
+          <Link
+            to="/archived"
             {...tooltipProps}
             data-tooltip-content="Archived"
-            className={`${isExpanded && "w-full"} p-3 flex gap-3 hover:bg-orange-300 dark:hover:bg-amber-800 rounded-full cursor-pointer`}
+            className={`${isExpanded && "w-full rounded-xl"} p-3 flex gap-3 hover:bg-orange-300 dark:hover:bg-amber-800 rounded-full cursor-pointer`}
           >
             <Archive className="w-6 h-6 text-amber-600" />
             {isExpanded && <span className="ml-2">Archived</span>}
-          </div>
+          </Link>
 
-          <div
+          <Link
+            to="/trash"
             {...tooltipProps}
             data-tooltip-content="Trash"
-            className={`${isExpanded && "w-full"} p-3 flex gap-3 hover:bg-orange-300 dark:hover:bg-amber-800 rounded-full cursor-pointer`}
+            className={`${isExpanded && "w-full rounded-xl"} p-3 flex gap-3 hover:bg-orange-300 dark:hover:bg-amber-800 rounded-full cursor-pointer`}
           >
             <Trash2 className="w-6 h-6 text-amber-600" />
             {isExpanded && <span className="ml-2">Trash</span>}
-          </div>
+          </Link>
 
-          <div
+          <Link
+            to="/settings"
             {...tooltipProps}
             data-tooltip-content="Settings"
-            className={`${isExpanded && "w-full"} p-3 flex gap-3 hover:bg-orange-300 dark:hover:bg-amber-800 rounded-full cursor-pointer`}
+            className={`${isExpanded && "w-full rounded-xl"} p-3 flex gap-3 hover:bg-orange-300 dark:hover:bg-amber-800 rounded-full cursor-pointer`}
           >
             <Settings className="w-6 h-6 text-amber-600" />
             {isExpanded && <span className="ml-2">Settings</span>}
-          </div>
+          </Link>
         </div>
       </aside>
 

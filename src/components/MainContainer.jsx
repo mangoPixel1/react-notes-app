@@ -11,6 +11,10 @@ import Note from "../pages/Note";
 import Landing from "../pages/Landing";
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
+import Folders from "../pages/Folders";
+import Archived from "../pages/Archived";
+import Trash from "../pages/Trash";
+import Settings from "../pages/SettingsPage";
 
 function MainContainer() {
   const { isDark } = useContext(UIContext);
@@ -30,6 +34,10 @@ function MainContainer() {
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<Home />} />
           <Route path="/dashboard/note/:id" element={<Note />} />
+          <Route path="/folders" element={<Folders />} />
+          <Route path="/archived" element={<Archived />} />
+          <Route path="/trash" element={<Trash />} />
+          <Route path="/settings" element={<Settings />} />
         </Route>
       </Routes>
     </div>
