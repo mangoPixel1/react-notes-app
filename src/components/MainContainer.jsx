@@ -6,7 +6,7 @@ import { UIContext } from "../contexts/UIContext";
 import AppLayout from "../layouts/AppLayout";
 
 // Pages
-import Home from "../pages/Home";
+import Dashboard from "../pages/Dashboard";
 import Note from "../pages/Note";
 import Landing from "../pages/Landing";
 import Login from "../pages/Login";
@@ -32,7 +32,7 @@ function MainContainer() {
 
         {/* Dashboard */}
         <Route element={<AppLayout />}>
-          <Route path="/dashboard" element={<Home />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/dashboard/note/:id" element={<Note />} />
           <Route path="/folders" element={<Folders />} />
           <Route path="/archived" element={<Archived />} />
