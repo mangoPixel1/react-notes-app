@@ -3,7 +3,7 @@ import { useState, useContext } from "react";
 // Contexts
 import { UIContext } from "../contexts/UIContext";
 
-function Search({ searchValue, handleInputChange }) {
+function Search({ searchValue, onChange }) {
   const { isDark } = useContext(UIContext);
 
   return (
@@ -19,7 +19,7 @@ function Search({ searchValue, handleInputChange }) {
             : "bg-orange-100 text-gray-600 placeholder-orange-400 "
         }`}
         value={searchValue}
-        onChange={handleInputChange}
+        onChange={(e) => onChange(e.target.value)}
       />
     </div>
   );

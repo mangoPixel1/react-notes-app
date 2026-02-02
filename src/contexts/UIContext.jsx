@@ -1,32 +1,17 @@
-import {
-  useState,
-  useEffect,
-  useCallback,
-  useContext,
-  createContext,
-} from "react";
+import { useState, useEffect, createContext } from "react";
 
 export const UIContext = createContext();
 
 export function UIProvider({ children }) {
-  // Color theme of UI
   const [isDark, setIsDark] = useState(false);
-
-  // Layout of NotesView (default: list)
   const [notesLayout, setNotesLayout] = useState("list");
-
-  // Visibility state of "add New Note" form in NotesView. Accessible in Header and NotesView
   const [addMode, setAddMode] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
 
   useEffect(() => {
     const body = document.body;
-    if (isDark) {
-      body.classList.add("bg-zinc-800");
-      body.classList.remove("bg-white");
-    } else {
-      body.classList.add("bg-white");
-      body.classList.remove("bg-zinc-800");
-    }
+    body.classList.toggle("bg-zinc-800", isDark);
+    body.classList.toggle("bg-white", !isDark);
   }, [isDark]);
 
   return (
@@ -38,6 +23,8 @@ export function UIProvider({ children }) {
         setNotesLayout,
         addMode,
         setAddMode,
+        searchValue,
+        setSearchValue,
       }}
     >
       {children}
