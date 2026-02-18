@@ -15,6 +15,7 @@ import Folders from "../pages/Folders";
 import Archived from "../pages/Archived";
 import Trash from "../pages/Trash";
 import Settings from "../pages/SettingsPage";
+import Profile from "../pages/ProfilePage";
 
 function MainContainer() {
   const { isDark } = useContext(UIContext);
@@ -37,6 +38,7 @@ function MainContainer() {
           <Route path="/folders" element={<Folders />} />
           <Route path="/archived" element={<Archived />} />
           <Route path="/trash" element={<Trash />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
       </Routes>
