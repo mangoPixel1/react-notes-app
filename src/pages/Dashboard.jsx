@@ -5,7 +5,6 @@ import { UIContext } from "../contexts/UIContext";
 import { NotesContext } from "../contexts/NotesContext";
 
 // Components
-import NewNoteModal from "../components/NewNoteModal";
 import NoteCard from "../components/NoteCard";
 
 import { LayoutGrid, LayoutList } from "lucide-react";
@@ -89,8 +88,6 @@ function Dashboard() {
 
   return (
     <div className="">
-      <NewNoteModal />
-
       <div className="flex gap-4">
         <button
           onClick={() =>

@@ -1,5 +1,6 @@
 import { Outlet } from "react-router";
 import Header from "../components/Header";
+import NewNoteModal from "../components/NewNoteModal";
 import Sidebar from "../components/Sidebar";
 
 export default function AppLayout() {
@@ -11,6 +12,7 @@ export default function AppLayout() {
       {/* Main dashboard content */}
       <div className="flex-1 flex flex-col">
         <Header />
+        <NewNoteModal />
 
         <main className="flex-1 p-6">
           <Outlet />

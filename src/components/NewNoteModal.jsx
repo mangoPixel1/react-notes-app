@@ -1,10 +1,13 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { useLocation } from "react-router";
 
 // Contexts
 import { UIContext } from "../contexts/UIContext";
 import { NotesContext } from "../contexts/NotesContext";
 
 function NewNoteModal() {
+  const location = useLocation();
+  const canAddNote = ["/dashboard", "/folders"].includes(location.pathname);
   const { addMode, setAddMode } = useContext(UIContext);
   const { addNote } = useContext(NotesContext);
   const colorOptions = ["yellow", "red", "green", "orange", "blue", "gray"];
@@ -16,6 +19,12 @@ function NewNoteModal() {
   });
 
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!canAddNote && addMode) {
+      setAddMode(false);
+    }
+  }, [canAddNote, addMode, setAddMode]);
 
   function handleAddNote(e) {
     e.preventDefault();
@@ -45,20 +54,17 @@ function NewNoteModal() {
   }
 
   function handleCancelNote(e) {
-    // cancel adding note
-    e.preventDefault();
-    if (addMode) {
-      setAddMode(false);
-      setNewNoteData({
-        title: "",
-        body: "",
-        color: "",
-      });
-      setError("");
-    }
+    // Clear form input data
+    setAddMode(false);
+    setNewNoteData({
+      title: "",
+      body: "",
+      color: "",
+    });
+    setError("");
   }
 
-  if (!addMode) return null;
+  if (!canAddNote || !addMode) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
@@ -138,6 +144,7 @@ function NewNoteModal() {
               Add Note
             </button>
             <button
+              type="button"
               onClick={handleCancelNote}
               className="rounded-md bg-gray-200 px-3 py-2 transition duration-300 hover:bg-gray-300 dark:bg-zinc-600 dark:hover:bg-zinc-700 cursor-pointer"
             >
