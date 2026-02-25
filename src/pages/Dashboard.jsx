@@ -9,22 +9,26 @@ import NoteCard from "../components/NoteCard";
 
 import { LayoutGrid, LayoutList } from "lucide-react";
 
+const colorSortOrder = {
+  red: 0,
+  orange: 1,
+  yellow: 2,
+  green: 3,
+  blue: 4,
+  gray: 5,
+};
+
 function Dashboard() {
   const { notesLayout, setNotesLayout, searchValue } = useContext(UIContext);
   const { notes } = useContext(NotesContext);
 
-  const colorSortOrder = {
-    red: 0,
-    orange: 1,
-    yellow: 2,
-    green: 3,
-    blue: 4,
-    gray: 5,
-  };
-
   const [sortOption, setSortOption] = useState("date-created-newest");
+  const activeNotes = useMemo(
+    () => notes.filter((note) => note.status === "active"),
+    [notes],
+  );
   const [sortedNotes, setSortedNotes] = useState(
-    [...notes].sort(
+    [...activeNotes].sort(
       (a, b) => new Date(b.creationDate) - new Date(a.creationDate),
     ),
   );
@@ -42,7 +46,7 @@ function Dashboard() {
     switch (sortOption) {
       case "date-created-newest":
         setSortedNotes(
-          [...notes].sort(
+          [...activeNotes].sort(
             (a, b) => new Date(b.creationDate) - new Date(a.creationDate),
           ),
         );
@@ -50,7 +54,7 @@ function Dashboard() {
 
       case "date-created-oldest":
         setSortedNotes(
-          [...notes].sort(
+          [...activeNotes].sort(
             (a, b) => new Date(a.creationDate) - new Date(b.creationDate),
           ),
         );
@@ -58,7 +62,7 @@ function Dashboard() {
 
       case "last-edited-newest":
         setSortedNotes(
-          [...notes].sort(
+          [...activeNotes].sort(
             (a, b) => new Date(b.lastEdited) - new Date(a.lastEdited),
           ),
         );
@@ -66,7 +70,7 @@ function Dashboard() {
 
       case "last-edited-oldest":
         setSortedNotes(
-          [...notes].sort(
+          [...activeNotes].sort(
             (a, b) => new Date(a.lastEdited) - new Date(b.lastEdited),
           ),
         );
@@ -74,17 +78,17 @@ function Dashboard() {
 
       case "color":
         setSortedNotes(
-          [...notes].sort(
+          [...activeNotes].sort(
             (a, b) => colorSortOrder[a.color] - colorSortOrder[b.color],
           ),
         );
         break;
       default:
         console.log("default sorting option");
-        setSortedNotes([...notes]);
+        setSortedNotes([...activeNotes]);
         break;
     }
-  }, [notes, sortOption]);
+  }, [activeNotes, sortOption]);
 
   return (
     <div className="">

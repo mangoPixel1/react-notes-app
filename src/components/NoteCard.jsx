@@ -5,10 +5,17 @@ import { Link } from "react-router";
 import { UIContext } from "../contexts/UIContext";
 import { NotesContext } from "../contexts/NotesContext";
 
-function NoteCard({ id, title, body, color, creationDate, lastEdited }) {
-  const { isDark, currentViewIndex, setCurrentViewIndex, setCurrentNoteID } =
-    useContext(UIContext);
-  const { removeNote } = useContext(NotesContext);
+function NoteCard({
+  id,
+  title,
+  body,
+  color,
+  creationDate,
+  variant = "default",
+}) {
+  const { isDark } = useContext(UIContext);
+  const { moveNoteToTrash, restoreNoteFromTrash, deleteNote } =
+    useContext(NotesContext);
 
   const colorMap = {
     yellow: isDark
@@ -55,7 +62,7 @@ function NoteCard({ id, title, body, color, creationDate, lastEdited }) {
 
   return (
     <div className={colorMap[color]}>
-      <Link to={`note/${id}`}>
+      <Link to={`/dashboard/note/${id}`}>
         <h1 className="font-semibold text-xl cursor-pointer hover:underline">
           {title}
         </h1>
@@ -64,15 +71,32 @@ function NoteCard({ id, title, body, color, creationDate, lastEdited }) {
       <p className="mb-4">{body}</p>
       <div className="flex justify-between">
         <p className="text-sm text-gray-500 italic">{`Created: ${formatDateStr(
-          creationDate
+          creationDate,
         )}`}</p>
         <div className="flex gap-2">
-          <button
-            onClick={() => removeNote(id)}
-            className="text-red-600 hover:text-red-700 cursor-pointer"
-          >
-            Delete
-          </button>
+          {variant === "trash" ? (
+            <>
+              <button
+                onClick={() => restoreNoteFromTrash(id)}
+                className="text-blue-600 hover:text-blue-700 cursor-pointer"
+              >
+                Restore
+              </button>
+              <button
+                onClick={() => deleteNote(id)}
+                className="text-red-600 hover:text-red-700 cursor-pointer"
+              >
+                Delete Forever
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => moveNoteToTrash(id)}
+              className="text-red-600 hover:text-red-700 cursor-pointer"
+            >
+              Delete
+            </button>
+          )}
         </div>
       </div>
     </div>

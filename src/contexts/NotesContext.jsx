@@ -12,6 +12,9 @@ const initialState = {
       title: "Mushroom",
       body: "A gray vegetable with an earthy flavor.",
       color: "gray",
+      status: "active",
+      folderId: null,
+      deletedAt: null,
     },
     {
       id: crypto.randomUUID(),
@@ -20,6 +23,9 @@ const initialState = {
       title: "Blueberry",
       body: "A small blue fruit high in antioxidants.",
       color: "blue",
+      status: "active",
+      folderId: null,
+      deletedAt: null,
     },
     {
       id: crypto.randomUUID(),
@@ -28,6 +34,9 @@ const initialState = {
       title: "Carrot",
       body: "A crunchy orange vegetable good for eyesight.",
       color: "orange",
+      status: "active",
+      folderId: null,
+      deletedAt: null,
     },
     {
       id: crypto.randomUUID(),
@@ -36,6 +45,9 @@ const initialState = {
       title: "Broccoli",
       body: "A green vegetable packed with vitamins.",
       color: "green",
+      status: "active",
+      folderId: null,
+      deletedAt: null,
     },
     {
       id: crypto.randomUUID(),
@@ -44,6 +56,9 @@ const initialState = {
       title: "Apple",
       body: "A sweet red fruit, crisp and juicy.",
       color: "red",
+      status: "active",
+      folderId: null,
+      deletedAt: null,
     },
     {
       id: crypto.randomUUID(),
@@ -52,13 +67,16 @@ const initialState = {
       title: "Banana",
       body: "A soft yellow fruit rich in potassium.",
       color: "yellow",
+      status: "active",
+      folderId: null,
+      deletedAt: null,
     },
   ],
 };
 
 function notesReducer(state, action) {
   switch (action.type) {
-    case "ADD_NOTE":
+    case "ADD_NOTE": {
       const newDate = new Date();
       const noteObj = {
         id: crypto.randomUUID(),
@@ -67,10 +85,14 @@ function notesReducer(state, action) {
         title: action.payload.title,
         body: action.payload.body,
         color: action.payload.color,
+        status: "active",
+        folderId: null,
+        deletedAt: null,
       };
       return { ...state, notesList: [...state.notesList, noteObj] };
+    }
 
-    case "EDIT_NOTE":
+    case "EDIT_NOTE": {
       const newEditDate = new Date();
       const { id, title, body } = action.payload;
 
@@ -87,15 +109,53 @@ function notesReducer(state, action) {
               title: trimmedTitle,
               body: trimmedBody,
             }
-          : note
+          : note,
       );
       return { ...state, notesList: updatedNotes };
+    }
 
-    case "DELETE_NOTE":
+    // Note is not permanently deleted, but moved to trash. It can be restored or permanently deleted from there.
+    case "MOVE_TO_TRASH": {
+      const deleteDate = new Date();
+      return {
+        ...state,
+        notesList: state.notesList.map((note) =>
+          note.id === action.payload
+            ? {
+                ...note,
+                status: "trashed",
+                deletedAt: deleteDate,
+                lastEdited: deleteDate,
+              }
+            : note,
+        ),
+      };
+    }
+
+    case "RESTORE_FROM_TRASH": {
+      const editDate = new Date();
+      return {
+        ...state,
+        notesList: state.notesList.map((note) =>
+          note.id === action.payload
+            ? {
+                ...note,
+                status: "active",
+                deletedAt: null,
+                lastEdited: editDate,
+              }
+            : note,
+        ),
+      };
+    }
+
+    // Permanently deletes note from state. This action is dispatched from Trash view when user chooses to permanently delete a note.
+    case "DELETE_NOTE": {
       return {
         ...state,
         notesList: state.notesList.filter((note) => note.id !== action.payload),
       };
+    }
     default:
       return state;
   }
@@ -116,13 +176,6 @@ export function NotesProvider({ children }) {
     });
   }
 
-  function removeNote(id) {
-    dispatch({
-      type: "DELETE_NOTE",
-      payload: id,
-    });
-  }
-
   function editNote(id, title, body) {
     dispatch({
       type: "EDIT_NOTE",
@@ -134,13 +187,36 @@ export function NotesProvider({ children }) {
     });
   }
 
+  function moveNoteToTrash(id) {
+    dispatch({
+      type: "MOVE_TO_TRASH",
+      payload: id,
+    });
+  }
+
+  function restoreNoteFromTrash(id) {
+    dispatch({
+      type: "RESTORE_FROM_TRASH",
+      payload: id,
+    });
+  }
+
+  function deleteNote(id) {
+    dispatch({
+      type: "DELETE_NOTE",
+      payload: id,
+    });
+  }
+
   return (
     <NotesContext.Provider
       value={{
         notes: state.notesList,
         addNote,
         editNote,
-        removeNote,
+        moveNoteToTrash,
+        restoreNoteFromTrash,
+        deleteNote,
       }}
     >
       {children}
