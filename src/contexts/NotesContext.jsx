@@ -114,6 +114,30 @@ function notesReducer(state, action) {
       return { ...state, notesList: updatedNotes };
     }
 
+    case "ARCHIVE_NOTE": {
+      const editDate = new Date();
+      return {
+        ...state,
+        notesList: state.notesList.map((note) =>
+          note.id === action.payload
+            ? { ...note, status: "archived", lastEdited: editDate }
+            : note,
+        ),
+      };
+    }
+
+    case "UNARCHIVE_NOTE": {
+      const editDate = new Date();
+      return {
+        ...state,
+        notesList: state.notesList.map((note) =>
+          note.id === action.payload
+            ? { ...note, status: "active", lastEdited: editDate }
+            : note,
+        ),
+      };
+    }
+
     // Note is not permanently deleted, but moved to trash. It can be restored or permanently deleted from there.
     case "MOVE_TO_TRASH": {
       const deleteDate = new Date();
@@ -187,6 +211,20 @@ export function NotesProvider({ children }) {
     });
   }
 
+  function archiveNote(id) {
+    dispatch({
+      type: "ARCHIVE_NOTE",
+      payload: id,
+    });
+  }
+
+  function unarchiveNote(id) {
+    dispatch({
+      type: "UNARCHIVE_NOTE",
+      payload: id,
+    });
+  }
+
   function moveNoteToTrash(id) {
     dispatch({
       type: "MOVE_TO_TRASH",
@@ -214,6 +252,8 @@ export function NotesProvider({ children }) {
         notes: state.notesList,
         addNote,
         editNote,
+        archiveNote,
+        unarchiveNote,
         moveNoteToTrash,
         restoreNoteFromTrash,
         deleteNote,

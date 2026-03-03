@@ -3,20 +3,18 @@ import { useContext, useState, useEffect } from "react";
 // Context
 import { NotesContext } from "../contexts/NotesContext";
 import { UIContext } from "../contexts/UIContext";
-import { Link, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 
 function Note() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
-  const { notes, editNote, removeNote } = useContext(NotesContext);
+  const { notes, editNote, archiveNote, unarchiveNote, moveNoteToTrash } =
+    useContext(NotesContext);
 
   const { isDark } = useContext(UIContext);
 
-  // refactor for better error handling/boundary?
-  const [note, setNote] = useState(() => {
-    const currentNote = notes.find((note) => note.id === id);
-    return currentNote ? currentNote : null;
-  });
+  const note = notes.find((currentNote) => currentNote.id === id) || null;
 
   const [editMode, setEditMode] = useState(false);
   const [editTitle, setEditTitle] = useState("");
@@ -26,6 +24,8 @@ function Note() {
   const [noteModified, setNoteModified] = useState(false);
 
   function handleSaveChanges() {
+    if (!note) return;
+
     if (noteModified) {
       editNote(note.id, editTitle, editBody);
     }
@@ -35,6 +35,8 @@ function Note() {
   }
 
   function handleCancelChanges() {
+    if (!note) return;
+
     // Reset state
     setEditTitle(note.title);
     setEditBody(note.body);
@@ -43,36 +45,45 @@ function Note() {
   }
 
   function handleDeleteNote() {
-    console.log("deleting note...");
-    removeNote(id);
-    navigateToNotesView();
+    if (!note) return;
+    moveNoteToTrash(note.id);
+    navigate("/dashboard");
   }
 
   // Detects when the note has been modified
   useEffect(() => {
+    if (!note) return;
+
     if (editMode && (note.title !== editTitle || note.body !== editBody)) {
       setNoteModified(true);
+    } else {
+      setNoteModified(false);
     }
-  }, [editTitle, editBody]);
-
-  // Detects when note has been updated
-  useEffect(() => {
-    const updatedNote = notes.find((n) => n.id === id);
-
-    if (updatedNote) {
-      setNote(updatedNote);
-      setEditTitle(updatedNote.title);
-      setEditBody(updatedNote.body);
-    }
-  }, [notes, id]);
+  }, [editTitle, editBody, editMode, note]);
 
   // Initializes edit field values
   useEffect(() => {
     if (note) {
       setEditTitle(note.title);
       setEditBody(note.body);
+    } else {
+      setEditTitle("");
+      setEditBody("");
     }
   }, [note]);
+
+  if (!note) {
+    return (
+      <div className="mt-10 space-y-4">
+        <p className="text-gray-500 italic">This note no longer exists.</p>
+        <Link to="/dashboard">
+          <button className="cursor-pointer hover:underline">
+            Back to notes
+          </button>
+        </Link>
+      </div>
+    );
+  }
 
   const colorMap = {
     yellow: isDark
@@ -173,6 +184,23 @@ function Note() {
               >
                 Edit
               </button>
+
+              {note.status === "archived" ? (
+                <button
+                  onClick={() => unarchiveNote(note.id)}
+                  className="cursor-pointer"
+                >
+                  Unarchive
+                </button>
+              ) : (
+                <button
+                  onClick={() => archiveNote(note.id)}
+                  className="cursor-pointer"
+                >
+                  Archive
+                </button>
+              )}
+
               <button
                 onClick={handleDeleteNote}
                 className="cursor-pointer text-red-600 hover:text-red-700"
@@ -186,10 +214,10 @@ function Note() {
             <h1 className="text-xl font-semibold">{note.title}</h1>
             <p>{note.body}</p>
             <p className="mt-5 text-sm text-gray-500 italic">{`Created: ${formatDateStr(
-              note.creationDate
+              note.creationDate,
             )}`}</p>
             <p className="mt-2 text-sm text-gray-500 italic">{`Modified: ${formatDateStr(
-              note.lastEdited
+              note.lastEdited,
             )}`}</p>
           </div>
         </>
