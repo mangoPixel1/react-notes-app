@@ -4,7 +4,7 @@ export const UIContext = createContext();
 
 export function UIProvider({ children }) {
   const [isDark, setIsDark] = useState(false);
-  const [notesLayout, setNotesLayout] = useState("list");
+  const [notesLayout, setNotesLayout] = useState("grid");
   const [addMode, setAddMode] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 

@@ -12,6 +12,7 @@ const initialState = {
       title: "Mushroom",
       body: "A gray vegetable with an earthy flavor.",
       color: "gray",
+      pinned: false,
       status: "active",
       folderId: null,
       deletedAt: null,
@@ -23,6 +24,7 @@ const initialState = {
       title: "Blueberry",
       body: "A small blue fruit high in antioxidants.",
       color: "blue",
+      pinned: true,
       status: "active",
       folderId: null,
       deletedAt: null,
@@ -34,6 +36,7 @@ const initialState = {
       title: "Carrot",
       body: "A crunchy orange vegetable good for eyesight.",
       color: "orange",
+      pinned: false,
       status: "active",
       folderId: null,
       deletedAt: null,
@@ -45,6 +48,7 @@ const initialState = {
       title: "Broccoli",
       body: "A green vegetable packed with vitamins.",
       color: "green",
+      pinned: false,
       status: "active",
       folderId: null,
       deletedAt: null,
@@ -56,6 +60,7 @@ const initialState = {
       title: "Apple",
       body: "A sweet red fruit, crisp and juicy.",
       color: "red",
+      pinned: true,
       status: "active",
       folderId: null,
       deletedAt: null,
@@ -67,6 +72,7 @@ const initialState = {
       title: "Banana",
       body: "A soft yellow fruit rich in potassium.",
       color: "yellow",
+      pinned: false,
       status: "active",
       folderId: null,
       deletedAt: null,
@@ -85,6 +91,7 @@ function notesReducer(state, action) {
         title: action.payload.title,
         body: action.payload.body,
         color: action.payload.color,
+        pinned: false,
         status: "active",
         folderId: null,
         deletedAt: null,
@@ -133,6 +140,30 @@ function notesReducer(state, action) {
         notesList: state.notesList.map((note) =>
           note.id === action.payload
             ? { ...note, status: "active", lastEdited: editDate }
+            : note,
+        ),
+      };
+    }
+
+    case "PIN_NOTE": {
+      const editDate = new Date();
+      return {
+        ...state,
+        notesList: state.notesList.map((note) =>
+          note.id === action.payload
+            ? { ...note, pinned: true, lastEdited: editDate }
+            : note,
+        ),
+      };
+    }
+
+    case "UNPIN_NOTE": {
+      const editDate = new Date();
+      return {
+        ...state,
+        notesList: state.notesList.map((note) =>
+          note.id === action.payload
+            ? { ...note, pinned: false, lastEdited: editDate }
             : note,
         ),
       };
@@ -225,6 +256,20 @@ export function NotesProvider({ children }) {
     });
   }
 
+  function pinNote(id) {
+    dispatch({
+      type: "PIN_NOTE",
+      payload: id,
+    });
+  }
+
+  function unpinNote(id) {
+    dispatch({
+      type: "UNPIN_NOTE",
+      payload: id,
+    });
+  }
+
   function moveNoteToTrash(id) {
     dispatch({
       type: "MOVE_TO_TRASH",
@@ -254,6 +299,8 @@ export function NotesProvider({ children }) {
         editNote,
         archiveNote,
         unarchiveNote,
+        pinNote,
+        unpinNote,
         moveNoteToTrash,
         restoreNoteFromTrash,
         deleteNote,

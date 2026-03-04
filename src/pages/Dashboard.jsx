@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect, useMemo } from "react";
+import { useState, useContext, useMemo, useCallback } from "react";
 
 // Contexts
 import { UIContext } from "../contexts/UIContext";
@@ -7,7 +7,8 @@ import { NotesContext } from "../contexts/NotesContext";
 // Components
 import NoteCard from "../components/NoteCard";
 
-import { LayoutGrid, LayoutList } from "lucide-react";
+// Icons
+import { LayoutGrid, LayoutList, Pin } from "lucide-react";
 
 const colorSortOrder = {
   red: 0,
@@ -19,19 +20,53 @@ const colorSortOrder = {
 };
 
 function Dashboard() {
+  // Read global UI state (layout + search text) and the full notes collection.
   const { notesLayout, setNotesLayout, searchValue } = useContext(UIContext);
   const { notes } = useContext(NotesContext);
 
+  // Track which sort mode is selected in the dropdown.
   const [sortOption, setSortOption] = useState("date-created-newest");
-  const activeNotes = useMemo(
-    () => notes.filter((note) => note.status === "active"),
-    [notes],
+
+  // Reusable comparator used by both pinned and unpinned note groups.
+  const sortNotes = useCallback(
+    (a, b) => {
+      switch (sortOption) {
+        case "date-created-newest":
+          return new Date(b.creationDate) - new Date(a.creationDate);
+        case "date-created-oldest":
+          return new Date(a.creationDate) - new Date(b.creationDate);
+        case "last-edited-newest":
+          return new Date(b.lastEdited) - new Date(a.lastEdited);
+        case "last-edited-oldest":
+          return new Date(a.lastEdited) - new Date(b.lastEdited);
+        case "color":
+          return colorSortOrder[a.color] - colorSortOrder[b.color];
+        default:
+          return 0;
+      }
+    },
+    [sortOption],
   );
-  const [sortedNotes, setSortedNotes] = useState(
-    [...activeNotes].sort(
-      (a, b) => new Date(b.creationDate) - new Date(a.creationDate),
-    ),
+
+  // Build the pinned notes section and keep it sorted by the active sort mode.
+  const activePinnedNotes = useMemo(
+    () =>
+      notes
+        .filter((note) => note.status === "active" && note.pinned === true)
+        .sort(sortNotes),
+    [notes, sortNotes],
   );
+
+  // Build the regular active notes section and keep it sorted by the active sort mode.
+  const sortedNotes = useMemo(
+    () =>
+      notes
+        .filter((note) => note.status === "active" && note.pinned === false)
+        .sort(sortNotes),
+    [notes, sortNotes],
+  );
+
+  // Apply search filtering only to the unpinned "All notes" section.
   const visibleNotes = useMemo(() => {
     if (!searchValue.trim()) return sortedNotes;
 
@@ -41,54 +76,6 @@ function Dashboard() {
         note.body.toLowerCase().includes(searchValue.toLowerCase()),
     );
   }, [sortedNotes, searchValue]);
-
-  useEffect(() => {
-    switch (sortOption) {
-      case "date-created-newest":
-        setSortedNotes(
-          [...activeNotes].sort(
-            (a, b) => new Date(b.creationDate) - new Date(a.creationDate),
-          ),
-        );
-        break;
-
-      case "date-created-oldest":
-        setSortedNotes(
-          [...activeNotes].sort(
-            (a, b) => new Date(a.creationDate) - new Date(b.creationDate),
-          ),
-        );
-        break;
-
-      case "last-edited-newest":
-        setSortedNotes(
-          [...activeNotes].sort(
-            (a, b) => new Date(b.lastEdited) - new Date(a.lastEdited),
-          ),
-        );
-        break;
-
-      case "last-edited-oldest":
-        setSortedNotes(
-          [...activeNotes].sort(
-            (a, b) => new Date(a.lastEdited) - new Date(b.lastEdited),
-          ),
-        );
-        break;
-
-      case "color":
-        setSortedNotes(
-          [...activeNotes].sort(
-            (a, b) => colorSortOrder[a.color] - colorSortOrder[b.color],
-          ),
-        );
-        break;
-      default:
-        console.log("default sorting option");
-        setSortedNotes([...activeNotes]);
-        break;
-    }
-  }, [activeNotes, sortOption]);
 
   return (
     <div className="">
@@ -124,16 +111,42 @@ function Dashboard() {
         </div>
       </div>
 
-      <div
-        className={`${
-          notesLayout === "grid"
-            ? `grid grid-cols-2 sm:grid-cols-3 gap-2`
-            : `space-y-4`
-        }`}
-      >
-        {visibleNotes.map((note) => (
-          <NoteCard key={note.id} {...note} />
-        ))}
+      <div>
+        {activePinnedNotes.length > 0 && (
+          <div className="mb-4">
+            <div className="flex items-center mb-2">
+              <Pin className="w-5 h-5 text-gray-500 mr-1" />
+              <h2 className="text-lg font-semibold">Pinned</h2>
+            </div>
+
+            <div
+              className={`${
+                notesLayout === "grid"
+                  ? `grid grid-cols-2 sm:grid-cols-3 gap-2`
+                  : `space-y-4`
+              }`}
+            >
+              {activePinnedNotes.map((note) => (
+                <NoteCard key={note.id} {...note} />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div>
+        <h2 className="text-lg font-semibold mb-2">All notes</h2>
+        <div
+          className={`${
+            notesLayout === "grid"
+              ? `grid grid-cols-2 sm:grid-cols-3 gap-2`
+              : `space-y-4`
+          }`}
+        >
+          {visibleNotes.map((note) => (
+            <NoteCard key={note.id} {...note} />
+          ))}
+        </div>
       </div>
     </div>
   );

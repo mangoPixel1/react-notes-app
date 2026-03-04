@@ -6,16 +6,28 @@ import { UIContext } from "../contexts/UIContext";
 import { Link, useNavigate, useParams } from "react-router";
 
 function Note() {
+  // Read the note id from the route and get navigation for redirects.
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const { notes, editNote, archiveNote, unarchiveNote, moveNoteToTrash } =
-    useContext(NotesContext);
+  // Read note data plus all actions used by the page controls.
+  const {
+    notes,
+    editNote,
+    archiveNote,
+    unarchiveNote,
+    pinNote,
+    unpinNote,
+    moveNoteToTrash,
+  } = useContext(NotesContext);
 
+  // Read theme mode for color-specific note styling.
   const { isDark } = useContext(UIContext);
 
+  // Resolve the current note from context using the route id.
   const note = notes.find((currentNote) => currentNote.id === id) || null;
 
+  // Local edit state for toggling edit mode and storing draft values.
   const [editMode, setEditMode] = useState(false);
   const [editTitle, setEditTitle] = useState("");
   const [editBody, setEditBody] = useState("");
@@ -23,6 +35,7 @@ function Note() {
   // True when note has been modified in edit mode
   const [noteModified, setNoteModified] = useState(false);
 
+  // Save note edits only when content changed, then exit edit mode.
   function handleSaveChanges() {
     if (!note) return;
 
@@ -34,6 +47,7 @@ function Note() {
     setEditMode(false);
   }
 
+  // Revert draft values back to note data and exit edit mode.
   function handleCancelChanges() {
     if (!note) return;
 
@@ -44,6 +58,7 @@ function Note() {
     setEditMode(false);
   }
 
+  // Move the note to trash and return to the dashboard.
   function handleDeleteNote() {
     if (!note) return;
     moveNoteToTrash(note.id);
@@ -72,6 +87,7 @@ function Note() {
     }
   }, [note]);
 
+  // Show a fallback state when the note id is no longer valid.
   if (!note) {
     return (
       <div className="mt-10 space-y-4">
@@ -85,6 +101,7 @@ function Note() {
     );
   }
 
+  // Map note colors to light/dark styles for the note container.
   const colorMap = {
     yellow: isDark
       ? "mt-3 p-3 border-2 border-yellow-400 bg-yellow-100 bg-zinc-700"
@@ -106,6 +123,7 @@ function Note() {
       : "mt-3 p-3 border-2 border-gray-400 bg-gray-100",
   };
 
+  // Lookup tables for the page-level date/time formatter.
   const months = [
     "Jan",
     "Feb",
@@ -122,6 +140,7 @@ function Note() {
   ];
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+  // Convert Date objects to the full "Day, Mon DD, YYYY at HH:MM" format.
   function formatDateStr(date) {
     const day = days[date.getDay()];
     const month = months[date.getMonth()];
@@ -198,6 +217,19 @@ function Note() {
                   className="cursor-pointer"
                 >
                   Archive
+                </button>
+              )}
+
+              {note.pinned ? (
+                <button
+                  onClick={() => unpinNote(note.id)}
+                  className="cursor-pointer"
+                >
+                  Unpin
+                </button>
+              ) : (
+                <button onClick={() => pinNote(note.id)} className="cursor-pointer">
+                  Pin
                 </button>
               )}
 

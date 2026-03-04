@@ -10,13 +10,17 @@ function NoteCard({
   title,
   body,
   color,
+  pinned,
   creationDate,
   variant = "default",
 }) {
+  // Read theme mode for note color styling.
   const { isDark } = useContext(UIContext);
-  const { moveNoteToTrash, restoreNoteFromTrash, deleteNote } =
+  // Read note actions used by card buttons.
+  const { moveNoteToTrash, restoreNoteFromTrash, deleteNote, pinNote, unpinNote } =
     useContext(NotesContext);
 
+  // Map each note color to light/dark card styles.
   const colorMap = {
     yellow: isDark
       ? "p-3 border border-2 border-yellow-400 bg-zinc-700"
@@ -38,6 +42,7 @@ function NoteCard({
       : "p-3 border border-gray-400 bg-gray-100",
   };
 
+  // Lookup tables for human-readable date formatting.
   const months = [
     "Jan",
     "Feb",
@@ -54,6 +59,7 @@ function NoteCard({
   ];
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+  // Convert a Date object to the short "Day, Mon DD, YYYY" string used on cards.
   function formatDateStr(date) {
     return `${days[date.getDay()]}, ${
       months[date.getMonth()]
@@ -90,12 +96,29 @@ function NoteCard({
               </button>
             </>
           ) : (
-            <button
-              onClick={() => moveNoteToTrash(id)}
-              className="text-red-600 hover:text-red-700 cursor-pointer"
-            >
-              Delete
-            </button>
+            <>
+              {pinned ? (
+                <button
+                  onClick={() => unpinNote(id)}
+                  className="cursor-pointer hover:underline"
+                >
+                  Unpin
+                </button>
+              ) : (
+                <button
+                  onClick={() => pinNote(id)}
+                  className="cursor-pointer hover:underline"
+                >
+                  Pin
+                </button>
+              )}
+              <button
+                onClick={() => moveNoteToTrash(id)}
+                className="text-red-600 hover:text-red-700 cursor-pointer"
+              >
+                Delete
+              </button>
+            </>
           )}
         </div>
       </div>
