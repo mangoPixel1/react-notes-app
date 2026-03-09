@@ -1,11 +1,117 @@
-import React from "react";
-import { FolderClosed } from "lucide-react";
+import { useState, useContext } from "react";
+import { FolderClosed, LayoutGrid, LayoutList } from "lucide-react";
+
+// Context
+import { NotesContext } from "../contexts/NotesContext";
+import { UIContext } from "../contexts/UIContext";
 
 function Folders() {
+  const { notesLayout, setNotesLayout } = useContext(UIContext);
+  const { folders, deleteFolder, editFolder, addFolder } =
+    useContext(NotesContext);
+
+  const [editingFolderId, setEditingFolderId] = useState(null);
+  const [newFolderName, setNewFolderName] = useState("");
+
+  const handleEditClick = (folder) => {
+    setEditingFolderId(folder.id);
+    setNewFolderName(folder.name);
+  };
+
+  const handleAddFolder = () => {
+    const defaultFolderName = "New Folder Name";
+    const newFolderId = addFolder(defaultFolderName);
+
+    setEditingFolderId(newFolderId);
+    setNewFolderName(defaultFolderName);
+  };
+
+  const handleSave = (id) => {
+    const folderName = newFolderName.trim() || "untitled folder";
+    editFolder(id, folderName);
+    setEditingFolderId(null);
+    setNewFolderName("");
+  };
+
   return (
-    <div className="flex flex-col justify-center items-center gap-5">
-      <h1 className="font-bold text-4xl text-gray-500">Folders</h1>
-      <FolderClosed className="w-16 h-16 text-gray-400" />
+    <div className="space-y-4">
+      <div className="flex items-center gap-4">
+        <FolderClosed className="w-10 h-10 text-gray-400" />
+        <h1 className="font-bold text-4xl text-gray-500">Folders</h1>
+        <button
+          onClick={handleAddFolder}
+          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 cursor-pointer"
+        >
+          Add New Folder
+        </button>
+      </div>
+      <div className="flex gap-4">
+        <button
+          onClick={() =>
+            setNotesLayout(notesLayout === "list" ? "grid" : "list")
+          }
+          className="cursor-pointer"
+        >
+          {notesLayout === "list" ? (
+            <LayoutGrid className="w-6 h-6 text-gray-500" />
+          ) : (
+            <LayoutList className="w-6 h-6 text-gray-500" />
+          )}
+        </button>
+      </div>
+      {folders.length === 0 ? (
+        <p className="text-gray-500">No folders yet.</p>
+      ) : (
+        <div
+          className={`grid gap-4 ${
+            notesLayout === "grid"
+              ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+              : ""
+          }`}
+        >
+          {folders.map((folder) => (
+            <div
+              key={folder.id}
+              className="flex justify-between bg-white p-4 rounded-lg shadow"
+            >
+              {editingFolderId === folder.id ? (
+                <input
+                  type="text"
+                  value={newFolderName}
+                  onChange={(e) => setNewFolderName(e.target.value)}
+                  onBlur={() => handleSave(folder.id)}
+                  onFocus={(e) => e.target.select()}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleSave(folder.id);
+                    }
+                  }}
+                  autoFocus
+                  className="font-bold text-xl text-gray-800 border border-gray-300 rounded px-2 py-1"
+                />
+              ) : (
+                <h2 className="font-bold text-xl text-gray-800">
+                  {folder.name}
+                </h2>
+              )}
+              <div className="space-x-2">
+                <button
+                  onClick={() => handleEditClick(folder)}
+                  className="cursor-pointer"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => deleteFolder(folder.id)}
+                  className="cursor-pointer text-red-500"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

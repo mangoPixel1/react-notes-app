@@ -78,6 +78,20 @@ const initialState = {
       deletedAt: null,
     },
   ],
+  foldersList: [
+    {
+      id: crypto.randomUUID(),
+      name: "Recipes",
+    },
+    {
+      id: crypto.randomUUID(),
+      name: "Work",
+    },
+    {
+      id: crypto.randomUUID(),
+      name: "Personal",
+    },
+  ],
 };
 
 function notesReducer(state, action) {
@@ -211,6 +225,36 @@ function notesReducer(state, action) {
         notesList: state.notesList.filter((note) => note.id !== action.payload),
       };
     }
+
+    // Add a new folder to the foldersList in state.
+    case "ADD_FOLDER": {
+      const newFolder = {
+        id: action.payload.id,
+        name: action.payload.name,
+      };
+      return { ...state, foldersList: [...state.foldersList, newFolder] };
+    }
+
+    // Edit an existing folder in the foldersList in state.
+    case "EDIT_FOLDER": {
+      const updatedFolders = state.foldersList.map((folder) =>
+        folder.id === action.payload.id
+          ? { ...folder, name: action.payload.name }
+          : folder,
+      );
+      return { ...state, foldersList: updatedFolders };
+    }
+
+    // Delete a folder from the foldersList in state. Does not delete the notes within that folder.
+    case "DELETE_FOLDER": {
+      return {
+        ...state,
+        foldersList: state.foldersList.filter(
+          (folder) => folder.id !== action.payload,
+        ),
+      };
+    }
+
     default:
       return state;
   }
@@ -291,10 +335,35 @@ export function NotesProvider({ children }) {
     });
   }
 
+  function addFolder(name) {
+    const id = crypto.randomUUID();
+    dispatch({
+      type: "ADD_FOLDER",
+      payload: { id, name },
+    });
+
+    return id;
+  }
+
+  function editFolder(id, name) {
+    dispatch({
+      type: "EDIT_FOLDER",
+      payload: { id, name },
+    });
+  }
+
+  function deleteFolder(id) {
+    dispatch({
+      type: "DELETE_FOLDER",
+      payload: id,
+    });
+  }
+
   return (
     <NotesContext.Provider
       value={{
         notes: state.notesList,
+        folders: state.foldersList,
         addNote,
         editNote,
         archiveNote,
@@ -304,6 +373,9 @@ export function NotesProvider({ children }) {
         moveNoteToTrash,
         restoreNoteFromTrash,
         deleteNote,
+        addFolder,
+        editFolder,
+        deleteFolder,
       }}
     >
       {children}

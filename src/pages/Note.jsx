@@ -6,11 +6,9 @@ import { UIContext } from "../contexts/UIContext";
 import { Link, useNavigate, useParams } from "react-router";
 
 function Note() {
-  // Read the note id from the route and get navigation for redirects.
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // Read note data plus all actions used by the page controls.
   const {
     notes,
     editNote,
@@ -21,18 +19,15 @@ function Note() {
     moveNoteToTrash,
   } = useContext(NotesContext);
 
-  // Read theme mode for color-specific note styling.
   const { isDark } = useContext(UIContext);
 
-  // Resolve the current note from context using the route id.
   const note = notes.find((currentNote) => currentNote.id === id) || null;
 
-  // Local edit state for toggling edit mode and storing draft values.
+  // Holds state for the edit form fields and tracks whether the note has been modified.
   const [editMode, setEditMode] = useState(false);
   const [editTitle, setEditTitle] = useState("");
   const [editBody, setEditBody] = useState("");
 
-  // True when note has been modified in edit mode
   const [noteModified, setNoteModified] = useState(false);
 
   // Save note edits only when content changed, then exit edit mode.
@@ -228,7 +223,10 @@ function Note() {
                   Unpin
                 </button>
               ) : (
-                <button onClick={() => pinNote(note.id)} className="cursor-pointer">
+                <button
+                  onClick={() => pinNote(note.id)}
+                  className="cursor-pointer"
+                >
                   Pin
                 </button>
               )}
