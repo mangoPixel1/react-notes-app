@@ -12,6 +12,7 @@ import Landing from "../pages/Landing";
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 import Folders from "../pages/Folders";
+import Folder from "../pages/Folder";
 import Archived from "../pages/Archived";
 import Trash from "../pages/Trash";
 import Settings from "../pages/SettingsPage";
@@ -36,6 +37,7 @@ function MainContainer() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/dashboard/note/:id" element={<Note />} />
           <Route path="/folders" element={<Folders />} />
+          <Route path="/folders/:id" element={<Folder />} />
           <Route path="/archived" element={<Archived />} />
           <Route path="/trash" element={<Trash />} />
           <Route path="/profile" element={<Profile />} />

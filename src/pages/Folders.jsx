@@ -1,7 +1,8 @@
 import { useState, useContext } from "react";
+import { Link } from "react-router";
 import { FolderClosed, LayoutGrid, LayoutList } from "lucide-react";
 
-// Context
+// Context imports for notes and UI state
 import { NotesContext } from "../contexts/NotesContext";
 import { UIContext } from "../contexts/UIContext";
 
@@ -10,14 +11,17 @@ function Folders() {
   const { folders, deleteFolder, editFolder, addFolder } =
     useContext(NotesContext);
 
+  // Local state for editing: tracks which folder is being edited and the new name
   const [editingFolderId, setEditingFolderId] = useState(null);
   const [newFolderName, setNewFolderName] = useState("");
 
+  // Handler to start editing a folder: sets editing state and pre-fills name
   const handleEditClick = (folder) => {
     setEditingFolderId(folder.id);
     setNewFolderName(folder.name);
   };
 
+  // Handler to add a new folder: creates folder with default name and starts editing
   const handleAddFolder = () => {
     const defaultFolderName = "New Folder Name";
     const newFolderId = addFolder(defaultFolderName);
@@ -26,6 +30,7 @@ function Folders() {
     setNewFolderName(defaultFolderName);
   };
 
+  // Handler to save edited folder name: trims input, saves, and resets editing state
   const handleSave = (id) => {
     const folderName = newFolderName.trim() || "untitled folder";
     editFolder(id, folderName);
@@ -35,6 +40,7 @@ function Folders() {
 
   return (
     <div className="space-y-4">
+      {/* Header section with title and add button */}
       <div className="flex items-center gap-4">
         <FolderClosed className="w-10 h-10 text-gray-400" />
         <h1 className="font-bold text-4xl text-gray-500">Folders</h1>
@@ -45,6 +51,7 @@ function Folders() {
           Add New Folder
         </button>
       </div>
+      {/* Layout toggle button */}
       <div className="flex gap-4">
         <button
           onClick={() =>
@@ -59,6 +66,7 @@ function Folders() {
           )}
         </button>
       </div>
+      {/* Conditional rendering: empty state or folder list */}
       {folders.length === 0 ? (
         <p className="text-gray-500">No folders yet.</p>
       ) : (
@@ -69,11 +77,13 @@ function Folders() {
               : ""
           }`}
         >
+          {/* Map over folders to render each one */}
           {folders.map((folder) => (
             <div
               key={folder.id}
               className="flex justify-between bg-white p-4 rounded-lg shadow"
             >
+              {/* Conditional rendering: input for editing or display name */}
               {editingFolderId === folder.id ? (
                 <input
                   type="text"
@@ -90,10 +100,11 @@ function Folders() {
                   className="font-bold text-xl text-gray-800 border border-gray-300 rounded px-2 py-1"
                 />
               ) : (
-                <h2 className="font-bold text-xl text-gray-800">
-                  {folder.name}
+                <h2 className="font-bold text-xl text-gray-800 cursor-pointer">
+                  <Link to={`/folders/${folder.id}`}>{folder.name}</Link>
                 </h2>
               )}
+              {/* Action buttons: edit and delete */}
               <div className="space-x-2">
                 <button
                   onClick={() => handleEditClick(folder)}
