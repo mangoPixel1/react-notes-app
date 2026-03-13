@@ -9,13 +9,14 @@ function NewNoteModal() {
   const location = useLocation();
   const canAddNote = ["/dashboard", "/folders"].includes(location.pathname);
   const { addMode, setAddMode } = useContext(UIContext);
-  const { addNote } = useContext(NotesContext);
+  const { folders, addNote } = useContext(NotesContext);
   const colorOptions = ["yellow", "red", "green", "orange", "blue", "gray"];
 
   const [newNoteData, setNewNoteData] = useState({
     title: "",
     body: "",
     color: "",
+    folderId: null,
   });
 
   const [error, setError] = useState("");
@@ -47,6 +48,7 @@ function NewNoteModal() {
       title: "",
       body: "",
       color: "",
+      folderId: null,
     });
 
     // Reset error messages
@@ -60,6 +62,7 @@ function NewNoteModal() {
       title: "",
       body: "",
       color: "",
+      folderId: null,
     });
     setError("");
   }
@@ -112,6 +115,7 @@ function NewNoteModal() {
               error && newNoteData.color === "" && `border border-red-600`
             }`}
           >
+            <span className="mr-3 font-semibold">Color:</span>
             {colorOptions.map((colorOption, index) => (
               <div key={index}>
                 <input
@@ -132,6 +136,27 @@ function NewNoteModal() {
                 </label>
               </div>
             ))}
+          </div>
+
+          <div>
+            <h3 className="mr-3 font-semibold">Folder:</h3>
+            <select
+              className="rounded-md border border-gray-500 bg-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-zinc-800"
+              value={newNoteData.folderId || ""}
+              onChange={(e) =>
+                setNewNoteData((prev) => ({
+                  ...prev,
+                  folderId: e.target.value || null,
+                }))
+              }
+            >
+              <option value="">Select a folder</option>
+              {folders.map((folder) => (
+                <option key={folder.id} value={folder.id}>
+                  {folder.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <p className="text-sm text-red-600">{error}</p>

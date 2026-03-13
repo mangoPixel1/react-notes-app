@@ -107,7 +107,7 @@ function notesReducer(state, action) {
         color: action.payload.color,
         pinned: false,
         status: "active",
-        folderId: null,
+        folderId: action.payload.folderId || null,
         deletedAt: null,
       };
       return { ...state, notesList: [...state.notesList, noteObj] };
@@ -255,6 +255,22 @@ function notesReducer(state, action) {
       };
     }
 
+    case "ADD_NOTE_TO_FOLDER": {
+      const { noteId, folderId } = action.payload;
+      const updatedNotes = state.notesList.map((note) =>
+        note.id === noteId ? { ...note, folderId: folderId } : note,
+      );
+      return { ...state, notesList: updatedNotes };
+    }
+
+    case "REMOVE_NOTE_FROM_FOLDER": {
+      const { noteId } = action.payload;
+      const updatedNotes = state.notesList.map((note) =>
+        note.id === noteId ? { ...note, folderId: null } : note,
+      );
+      return { ...state, notesList: updatedNotes };
+    }
+
     default:
       return state;
   }
@@ -271,6 +287,7 @@ export function NotesProvider({ children }) {
         title: newNote.title,
         body: newNote.body,
         color: newNote.color,
+        folderId: newNote.folderId,
       },
     });
   }
@@ -359,6 +376,20 @@ export function NotesProvider({ children }) {
     });
   }
 
+  function addNoteToFolder(noteId, folderId) {
+    dispatch({
+      type: "ADD_NOTE_TO_FOLDER",
+      payload: { noteId, folderId },
+    });
+  }
+
+  function removeNoteFromFolder(noteId) {
+    dispatch({
+      type: "REMOVE_NOTE_FROM_FOLDER",
+      payload: { noteId },
+    });
+  }
+
   return (
     <NotesContext.Provider
       value={{
@@ -376,6 +407,8 @@ export function NotesProvider({ children }) {
         addFolder,
         editFolder,
         deleteFolder,
+        addNoteToFolder,
+        removeNoteFromFolder,
       }}
     >
       {children}
