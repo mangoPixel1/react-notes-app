@@ -8,7 +8,7 @@ import { UIContext } from "../contexts/UIContext";
 
 function Folders() {
   const { notesLayout, setNotesLayout } = useContext(UIContext);
-  const { folders, deleteFolder, editFolder, addFolder } =
+  const { notes, folders, deleteFolder, editFolder, addFolder } =
     useContext(NotesContext);
 
   // Local state for editing: tracks which folder is being edited and the new name
@@ -100,8 +100,10 @@ function Folders() {
                   className="font-bold text-xl text-gray-800 border border-gray-300 rounded px-2 py-1"
                 />
               ) : (
-                <h2 className="font-bold text-xl text-gray-800 cursor-pointer">
-                  <Link to={`/folders/${folder.id}`}>{folder.name}</Link>
+                <h2 className="font-semibold text-lg text-gray-600 cursor-pointer">
+                  <Link
+                    to={`/folders/${folder.id}`}
+                  >{`${folder.name} (${notes.filter((note) => note.folderId === folder.id).length})`}</Link>
                 </h2>
               )}
               {/* Action buttons: edit and delete */}

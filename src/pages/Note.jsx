@@ -4,6 +4,7 @@ import { useContext, useState, useEffect } from "react";
 import { NotesContext } from "../contexts/NotesContext";
 import { UIContext } from "../contexts/UIContext";
 import { Link, useNavigate, useParams } from "react-router";
+import { ChevronRight } from "lucide-react";
 
 function Note() {
   const { id } = useParams();
@@ -11,12 +12,15 @@ function Note() {
 
   const {
     notes,
+    folders,
     editNote,
     archiveNote,
     unarchiveNote,
     pinNote,
     unpinNote,
     moveNoteToTrash,
+    addNoteToFolder,
+    removeNoteFromFolder,
   } = useContext(NotesContext);
 
   const { isDark } = useContext(UIContext);
@@ -58,6 +62,16 @@ function Note() {
     if (!note) return;
     moveNoteToTrash(note.id);
     navigate("/dashboard");
+  }
+
+  function handleMoveToFolder(event) {
+    if (!note) return;
+    const selectedFolderId = event.target.value; // selected value from dropdown
+    if (!selectedFolderId) {
+      removeNoteFromFolder(note.id); // If "No folder" is selected, remove from any folder
+      return;
+    }
+    addNoteToFolder(note.id, selectedFolderId);
   }
 
   // Detects when the note has been modified
@@ -192,6 +206,22 @@ function Note() {
             </Link>
 
             <div className="space-x-2">
+              <label className="inline-flex items-center gap-2">
+                <select
+                  className="rounded-md border border-gray-500 bg-white px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-zinc-800"
+                  value={note.folderId || ""}
+                  onChange={handleMoveToFolder}
+                  disabled={folders.length === 0}
+                >
+                  <option value="">No folder</option>
+                  {folders.map((folder) => (
+                    <option key={folder.id} value={folder.id}>
+                      {folder.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
               <button
                 onClick={() => setEditMode(true)}
                 className="cursor-pointer"
