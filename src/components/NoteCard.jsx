@@ -12,6 +12,7 @@ function NoteCard({
   color,
   pinned,
   creationDate,
+  backLabel,
   variant = "default",
 }) {
   // Read theme mode for note color styling.
@@ -68,7 +69,7 @@ function NoteCard({
 
   return (
     <div className={colorMap[color]}>
-      <Link to={`/dashboard/note/${id}`}>
+      <Link to={`/note/${id}`} state={backLabel ? { backLabel } : undefined}>
         <h1 className="font-semibold text-xl cursor-pointer hover:underline">
           {title}
         </h1>

@@ -35,7 +35,7 @@ function MainContainer() {
         {/* Dashboard */}
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/dashboard/note/:id" element={<Note />} />
+          <Route path="/note/:id" element={<Note />} />
           <Route path="/folders" element={<Folders />} />
           <Route path="/folders/:id" element={<Folder />} />
           <Route path="/archived" element={<Archived />} />

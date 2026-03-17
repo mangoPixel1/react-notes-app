@@ -3,12 +3,12 @@ import { useContext, useState, useEffect } from "react";
 // Context
 import { NotesContext } from "../contexts/NotesContext";
 import { UIContext } from "../contexts/UIContext";
-import { Link, useNavigate, useParams } from "react-router";
-import { ChevronRight } from "lucide-react";
+import { useLocation, useNavigate, useParams } from "react-router";
 
 function Note() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const {
     notes,
@@ -34,6 +34,19 @@ function Note() {
 
   const [noteModified, setNoteModified] = useState(false);
 
+  const backLabel =
+    typeof location.state?.backLabel === "string" && location.state.backLabel
+      ? location.state.backLabel
+      : "Back to notes";
+
+  function handleBackToNotes() {
+    if (window.history.length > 1) {
+      navigate(-1);
+      return;
+    }
+    navigate("/dashboard");
+  }
+
   // Save note edits only when content changed, then exit edit mode.
   function handleSaveChanges() {
     if (!note) return;
@@ -57,11 +70,11 @@ function Note() {
     setEditMode(false);
   }
 
-  // Move the note to trash and return to the dashboard.
+  // Move the note to trash and return to the previous page.
   function handleDeleteNote() {
     if (!note) return;
     moveNoteToTrash(note.id);
-    navigate("/dashboard");
+    handleBackToNotes();
   }
 
   function handleMoveToFolder(event) {
@@ -101,11 +114,12 @@ function Note() {
     return (
       <div className="mt-10 space-y-4">
         <p className="text-gray-500 italic">This note no longer exists.</p>
-        <Link to="/dashboard">
-          <button className="cursor-pointer hover:underline">
-            Back to notes
-          </button>
-        </Link>
+        <button
+          onClick={handleBackToNotes}
+          className="cursor-pointer hover:underline"
+        >
+          {backLabel}
+        </button>
       </div>
     );
   }
@@ -164,7 +178,7 @@ function Note() {
   }
 
   return (
-    <div className="mt-10">
+    <div className="">
       {editMode ? (
         <>
           <div className="flex justify-end">
@@ -199,11 +213,12 @@ function Note() {
       ) : (
         <>
           <div className="flex justify-between">
-            <Link to="/dashboard">
-              <button className="cursor-pointer hover:underline">
-                Back to notes
-              </button>
-            </Link>
+            <button
+              onClick={handleBackToNotes}
+              className="cursor-pointer hover:underline"
+            >
+              {backLabel}
+            </button>
 
             <div className="space-x-2">
               <label className="inline-flex items-center gap-2">

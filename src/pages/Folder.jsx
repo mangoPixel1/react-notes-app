@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { Link, useNavigate, useParams } from "react-router";
+import { Link, useParams } from "react-router";
 import { ArrowLeft, FolderClosed, LayoutGrid, LayoutList } from "lucide-react";
 
 import { NotesContext } from "../contexts/NotesContext";
@@ -9,10 +9,10 @@ import NoteCard from "../components/NoteCard";
 
 function Folder() {
   const { id } = useParams();
-  const navigate = useNavigate();
 
   const { notes, folders } = useContext(NotesContext);
   const { notesLayout, setNotesLayout } = useContext(UIContext);
+  const folderName = folders.find((folder) => folder.id === id)?.name;
 
   return (
     <div className="space-y-4">
@@ -46,11 +46,21 @@ function Folder() {
       </div>
 
       {notes.filter((note) => note.folderId === id).length > 0 ? (
-        <ul>
+        <ul
+          className={`${
+            notesLayout === "grid"
+              ? `grid grid-cols-2 sm:grid-cols-3 gap-2`
+              : `space-y-4`
+          }`}
+        >
           {notes
             .filter((note) => note.folderId === id)
             .map((note) => (
-              <NoteCard key={note.id} {...note} />
+              <NoteCard
+                key={note.id}
+                {...note}
+                backLabel={folderName ? `Back to ${folderName}` : undefined}
+              />
             ))}
         </ul>
       ) : (
