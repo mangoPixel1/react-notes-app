@@ -13,7 +13,7 @@ function Archived() {
     () =>
       notes
         .filter((note) => note.status === "archived")
-        .sort((a, b) => new Date(b.deletedAt) - new Date(a.deletedAt)),
+        .sort((a, b) => new Date(b.lastEdited) - new Date(a.lastEdited)),
     [notes],
   );
 

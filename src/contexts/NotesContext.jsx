@@ -245,12 +245,15 @@ function notesReducer(state, action) {
       return { ...state, foldersList: updatedFolders };
     }
 
-    // Delete a folder from the foldersList in state. Does not delete the notes within that folder.
+    // Delete a folder from the foldersList in state. Also unassigns any notes that were in that folder (sets their folderId to null).
     case "DELETE_FOLDER": {
       return {
         ...state,
         foldersList: state.foldersList.filter(
           (folder) => folder.id !== action.payload,
+        ),
+        notesList: state.notesList.map((note) =>
+          note.folderId === action.payload ? { ...note, folderId: null } : note,
         ),
       };
     }
