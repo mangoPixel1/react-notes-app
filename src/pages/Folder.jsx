@@ -1,18 +1,19 @@
 import { useContext } from "react";
 import { Link, useParams } from "react-router";
-import { ArrowLeft, FolderClosed, LayoutGrid, LayoutList } from "lucide-react";
+import { ArrowLeft, FolderClosed } from "lucide-react";
 
 import { NotesContext } from "../contexts/NotesContext";
-import { UIContext } from "../contexts/UIContext";
 
 import NoteCard from "../components/NoteCard";
+import LayoutToggle from "../components/LayoutToggle";
+import NotesGrid from "../components/NotesGrid";
 
 function Folder() {
   const { id } = useParams();
 
   const { notes, folders } = useContext(NotesContext);
-  const { notesLayout, setNotesLayout } = useContext(UIContext);
-  const folderName = folders.find((folder) => folder.id === id)?.name;
+  const folder = folders.find((f) => f.id === id);
+  const folderNotes = notes.filter((note) => note.folderId === id);
 
   return (
     <div className="space-y-4">
@@ -24,45 +25,23 @@ function Folder() {
       </Link>
       <div className="flex items-center gap-4">
         <FolderClosed className="w-10 h-10 text-gray-400" />
-        <h2 className="font-bold text-3xl text-gray-500">
-          {folders.find((folder) => folder.id === id)?.name}
-        </h2>
+        <h2 className="font-bold text-3xl text-gray-500">{folder?.name}</h2>
       </div>
 
-      {/* Layout toggle button */}
       <div className="flex gap-4">
-        <button
-          onClick={() =>
-            setNotesLayout(notesLayout === "list" ? "grid" : "list")
-          }
-          className="cursor-pointer"
-        >
-          {notesLayout === "list" ? (
-            <LayoutGrid className="w-6 h-6 text-gray-500" />
-          ) : (
-            <LayoutList className="w-6 h-6 text-gray-500" />
-          )}
-        </button>
+        <LayoutToggle />
       </div>
 
-      {notes.filter((note) => note.folderId === id).length > 0 ? (
-        <ul
-          className={`${
-            notesLayout === "grid"
-              ? `grid grid-cols-2 sm:grid-cols-3 gap-2`
-              : `space-y-4`
-          }`}
-        >
-          {notes
-            .filter((note) => note.folderId === id)
-            .map((note) => (
-              <NoteCard
-                key={note.id}
-                {...note}
-                backLabel={folderName ? `Back to ${folderName}` : undefined}
-              />
-            ))}
-        </ul>
+      {folderNotes.length > 0 ? (
+        <NotesGrid>
+          {folderNotes.map((note) => (
+            <NoteCard
+              key={note.id}
+              {...note}
+              backLabel={folder ? `Back to ${folder.name}` : undefined}
+            />
+          ))}
+        </NotesGrid>
       ) : (
         <h2>No notes in this folder.</h2>
       )}

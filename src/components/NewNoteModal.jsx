@@ -1,16 +1,15 @@
 import { useContext, useEffect, useState } from "react";
 import { useLocation } from "react-router";
 
-// Contexts
 import { UIContext } from "../contexts/UIContext";
 import { NotesContext } from "../contexts/NotesContext";
+import { NOTE_COLORS, ADD_NOTE_PATHS } from "../constants";
 
 function NewNoteModal() {
   const location = useLocation();
-  const canAddNote = ["/dashboard", "/folders"].includes(location.pathname);
+  const canAddNote = ADD_NOTE_PATHS.includes(location.pathname);
   const { addMode, setAddMode } = useContext(UIContext);
   const { folders, addNote } = useContext(NotesContext);
-  const colorOptions = ["yellow", "red", "green", "orange", "blue", "gray"];
 
   const [newNoteData, setNewNoteData] = useState({
     title: "",
@@ -30,40 +29,20 @@ function NewNoteModal() {
   function handleAddNote(e) {
     e.preventDefault();
 
-    // Form validation to check for empty fields
-    if (
-      newNoteData.title === "" ||
-      newNoteData.body === "" ||
-      newNoteData.color === ""
-    ) {
+    if (newNoteData.title === "" || newNoteData.body === "" || newNoteData.color === "") {
       setError("All fields are required.");
       return;
     }
 
     addNote(newNoteData);
     setAddMode(false);
-
-    // Clear form input fields
-    setNewNoteData({
-      title: "",
-      body: "",
-      color: "",
-      folderId: null,
-    });
-
-    // Reset error messages
+    setNewNoteData({ title: "", body: "", color: "", folderId: null });
     setError("");
   }
 
-  function handleCancelNote(e) {
-    // Clear form input data
+  function handleCancelNote() {
     setAddMode(false);
-    setNewNoteData({
-      title: "",
-      body: "",
-      color: "",
-      folderId: null,
-    });
+    setNewNoteData({ title: "", body: "", color: "", folderId: null });
     setError("");
   }
 
@@ -83,9 +62,7 @@ function NewNoteModal() {
           <div className="space-y-2">
             <input
               className={`block w-full rounded-md border px-3 py-2 ${
-                error && newNoteData.title === ""
-                  ? `border-red-600`
-                  : `border-gray-500`
+                error && newNoteData.title === "" ? `border-red-600` : `border-gray-500`
               }`}
               type="text"
               placeholder="Title"
@@ -96,9 +73,7 @@ function NewNoteModal() {
             />
             <textarea
               className={`block min-h-32 w-full rounded-md border px-3 py-2 ${
-                error && newNoteData.body === ""
-                  ? `border-red-600`
-                  : `border-gray-500`
+                error && newNoteData.body === "" ? `border-red-600` : `border-gray-500`
               }`}
               name="note-body"
               id="note-body"
@@ -116,8 +91,8 @@ function NewNoteModal() {
             }`}
           >
             <span className="mr-3 font-semibold">Color:</span>
-            {colorOptions.map((colorOption, index) => (
-              <div key={index}>
+            {NOTE_COLORS.map((colorOption) => (
+              <div key={colorOption}>
                 <input
                   type="radio"
                   id={colorOption}
@@ -125,10 +100,7 @@ function NewNoteModal() {
                   value={colorOption}
                   checked={newNoteData.color === colorOption}
                   onChange={(e) =>
-                    setNewNoteData((prev) => ({
-                      ...prev,
-                      color: e.target.value,
-                    }))
+                    setNewNoteData((prev) => ({ ...prev, color: e.target.value }))
                   }
                 />
                 <label htmlFor={colorOption} className="ml-1 mr-3">

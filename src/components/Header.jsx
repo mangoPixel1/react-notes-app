@@ -1,45 +1,24 @@
 import { useContext } from "react";
 import { Link, useLocation } from "react-router";
 
-// Contexts
 import { UIContext } from "../contexts/UIContext";
+import { ADD_NOTE_PATHS } from "../constants";
 
-// Components
 import Search from "./Search";
-
-// Icons
 import Logo from "../icons/Logo";
-import {
-  Sun,
-  Moon,
-  RefreshCw,
-  CircleUserRound,
-  CirclePlus,
-} from "lucide-react";
+import { Sun, Moon, RefreshCw, CircleUserRound, CirclePlus } from "lucide-react";
 
 function Header() {
   const location = useLocation();
-  const canAddNote = ["/dashboard", "/folders"].includes(location.pathname);
+  const canAddNote = ADD_NOTE_PATHS.includes(location.pathname);
 
-  const {
-    isDark,
-    setIsDark,
-    notesLayout,
-    setNotesLayout,
-    addMode,
-    setAddMode,
-    searchValue,
-    setSearchValue,
-  } = useContext(UIContext);
+  const { isDark, setIsDark, addMode, setAddMode, searchValue, setSearchValue } =
+    useContext(UIContext);
 
   function toggleAddMode() {
     if (!addMode) {
       setAddMode(true);
     }
-  }
-
-  function toggleLayoutView() {
-    notesLayout === "list" ? setNotesLayout("grid") : setNotesLayout("list");
   }
 
   return (

@@ -1,5 +1,6 @@
 import { useState, useEffect, createContext } from "react";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const UIContext = createContext();
 
 export function UIProvider({ children }) {

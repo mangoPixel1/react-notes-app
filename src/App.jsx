@@ -1,4 +1,3 @@
-import { useContext, useState } from "react";
 import "./App.css";
 
 // Contexts

@@ -1,18 +1,20 @@
 import { useContext, useMemo } from "react";
-import { Archive, LayoutGrid, LayoutList } from "lucide-react";
+import { Archive } from "lucide-react";
 
 import { NotesContext } from "../contexts/NotesContext";
-import { UIContext } from "../contexts/UIContext";
+import { NOTE_STATUS } from "../constants";
+
 import NoteCard from "../components/NoteCard";
+import LayoutToggle from "../components/LayoutToggle";
+import NotesGrid from "../components/NotesGrid";
 
 function Archived() {
-  const { notesLayout, setNotesLayout } = useContext(UIContext);
   const { notes } = useContext(NotesContext);
 
   const archivedNotes = useMemo(
     () =>
       notes
-        .filter((note) => note.status === "archived")
+        .filter((note) => note.status === NOTE_STATUS.ARCHIVED)
         .sort((a, b) => new Date(b.lastEdited) - new Date(a.lastEdited)),
     [notes],
   );
@@ -25,34 +27,17 @@ function Archived() {
       </div>
 
       <div className="flex gap-4">
-        <button
-          onClick={() =>
-            setNotesLayout(notesLayout === "list" ? "grid" : "list")
-          }
-          className="cursor-pointer"
-        >
-          {notesLayout === "list" ? (
-            <LayoutGrid className="w-6 h-6 text-gray-500" />
-          ) : (
-            <LayoutList className="w-6 h-6 text-gray-500" />
-          )}
-        </button>
+        <LayoutToggle />
       </div>
 
       {archivedNotes.length === 0 ? (
         <p className="text-gray-500 italic">No archived notes.</p>
       ) : (
-        <div
-          className={`${
-            notesLayout === "grid"
-              ? `grid grid-cols-2 sm:grid-cols-3 gap-2`
-              : `space-y-4`
-          }`}
-        >
+        <NotesGrid>
           {archivedNotes.map((note) => (
             <NoteCard key={note.id} {...note} variant="archived" />
           ))}
-        </div>
+        </NotesGrid>
       )}
     </div>
   );

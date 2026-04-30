@@ -1,9 +1,10 @@
 import { useContext } from "react";
 import { Link } from "react-router";
 
-// Contexts
 import { UIContext } from "../contexts/UIContext";
 import { NotesContext } from "../contexts/NotesContext";
+import { NOTE_COLOR_CLASSES } from "../constants";
+import { formatDateShort } from "../utils/formatDate";
 
 function NoteCard({
   id,
@@ -15,60 +16,15 @@ function NoteCard({
   backLabel,
   variant = "default",
 }) {
-  // Read theme mode for note color styling.
   const { isDark } = useContext(UIContext);
-  // Read note actions used by card buttons.
   const { moveNoteToTrash, restoreNoteFromTrash, deleteNote, pinNote, unpinNote } =
     useContext(NotesContext);
 
-  // Map each note color to light/dark card styles.
-  const colorMap = {
-    yellow: isDark
-      ? "p-3 border border-2 border-yellow-400 bg-zinc-700"
-      : "p-3 border border-2 border-yellow-400 bg-yellow-100",
-    red: isDark
-      ? "p-3 border border-2 border-red-400 bg-zinc-700"
-      : "p-3 border border-red-400 bg-red-100",
-    green: isDark
-      ? "p-3 border border-2 border-green-400 bg-zinc-700"
-      : "p-3 border border-green-400 bg-green-100",
-    orange: isDark
-      ? "p-3 border border-2 border-orange-400 bg-zinc-700"
-      : "p-3 border border-orange-400 bg-orange-100",
-    blue: isDark
-      ? "p-3 border border-2 border-blue-400 bg-zinc-700"
-      : "p-3 border border-blue-400 bg-blue-100",
-    gray: isDark
-      ? "p-3 border border-2 border-gray-400 bg-zinc-700"
-      : "p-3 border border-gray-400 bg-gray-100",
-  };
-
-  // Lookup tables for human-readable date formatting.
-  const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-  // Convert a Date object to the short "Day, Mon DD, YYYY" string used on cards.
-  function formatDateStr(date) {
-    return `${days[date.getDay()]}, ${
-      months[date.getMonth()]
-    } ${date.getDate()}, ${date.getFullYear()}`;
-  }
+  const { border, lightBg, darkBg } = NOTE_COLOR_CLASSES[color];
+  const colorClass = `p-3 ${border} ${isDark ? darkBg : lightBg}`;
 
   return (
-    <div className={colorMap[color]}>
+    <div className={colorClass}>
       <Link to={`/note/${id}`} state={backLabel ? { backLabel } : undefined}>
         <h1 className="font-semibold text-xl cursor-pointer hover:underline">
           {title}
@@ -77,9 +33,7 @@ function NoteCard({
 
       <p className="mb-4">{body}</p>
       <div className="flex justify-between">
-        <p className="text-sm text-gray-500 italic">{`Created: ${formatDateStr(
-          creationDate,
-        )}`}</p>
+        <p className="text-sm text-gray-500 italic">{`Created: ${formatDateShort(creationDate)}`}</p>
         <div className="flex gap-2">
           {variant === "trash" ? (
             <>
@@ -99,17 +53,11 @@ function NoteCard({
           ) : (
             <>
               {pinned ? (
-                <button
-                  onClick={() => unpinNote(id)}
-                  className="cursor-pointer hover:underline"
-                >
+                <button onClick={() => unpinNote(id)} className="cursor-pointer hover:underline">
                   Unpin
                 </button>
               ) : (
-                <button
-                  onClick={() => pinNote(id)}
-                  className="cursor-pointer hover:underline"
-                >
+                <button onClick={() => pinNote(id)} className="cursor-pointer hover:underline">
                   Pin
                 </button>
               )}
