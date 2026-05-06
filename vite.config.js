@@ -6,7 +6,12 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss({
-      config: "./tailwind.config.js", // 👈 This enables config mode
+      config: "./tailwind.config.js",
     }),
   ],
+  test: {
+    environment: "jsdom",
+    globals: true,
+    setupFiles: "./src/test/setup.js",
+  },
 });

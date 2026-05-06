@@ -16,7 +16,7 @@ const initialState = {
   error: null,
 };
 
-function notesReducer(state, action) {
+export function notesReducer(state, action) {
   switch (action.type) {
     case "SET_LOADING":
       return { ...state, isLoading: action.payload };
