@@ -1,10 +1,11 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { useContext, useState } from "react";
+import { Link } from "react-router";
 
+import { AuthContext } from "../contexts/AuthContext";
 import Logo from "../icons/Logo";
 
 function Login() {
-  const navigate = useNavigate();
+  const { signIn } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -19,8 +20,8 @@ function Login() {
     setIsSubmitting(true);
     setError("");
     try {
-      // await supabase.auth.signInWithPassword({ email, password });
-      navigate("/dashboard");
+      await signIn(email, password);
+      // Navigation is handled automatically by the route guard reacting to the session change
     } catch (err) {
       setError(err.message || "Login failed. Please try again.");
     } finally {

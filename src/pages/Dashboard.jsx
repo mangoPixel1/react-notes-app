@@ -30,6 +30,7 @@ function Dashboard() {
         case "color":
           return COLOR_SORT_ORDER[a.color] - COLOR_SORT_ORDER[b.color];
         default:
+          console.warn("Unknown sort option:", sortOption);
           return 0;
       }
     },
@@ -39,7 +40,9 @@ function Dashboard() {
   const activePinnedNotes = useMemo(
     () =>
       notes
-        .filter((note) => note.status === NOTE_STATUS.ACTIVE && note.pinned === true)
+        .filter(
+          (note) => note.status === NOTE_STATUS.ACTIVE && note.pinned === true,
+        )
         .sort(sortNotes),
     [notes, sortNotes],
   );
@@ -47,7 +50,7 @@ function Dashboard() {
   const sortedNotes = useMemo(
     () =>
       notes
-        .filter((note) => note.status === NOTE_STATUS.ACTIVE && note.pinned === false)
+        .filter((note) => note.status === NOTE_STATUS.ACTIVE && !note.pinned)
         .sort(sortNotes),
     [notes, sortNotes],
   );
@@ -56,8 +59,8 @@ function Dashboard() {
     if (!searchValue.trim()) return sortedNotes;
     return sortedNotes.filter(
       (note) =>
-        note.title.toLowerCase().includes(searchValue.toLowerCase()) ||
-        note.body.toLowerCase().includes(searchValue.toLowerCase()),
+        (note.title ?? "").toLowerCase().includes(searchValue.toLowerCase()) ||
+        (note.body ?? "").toLowerCase().includes(searchValue.toLowerCase()),
     );
   }, [sortedNotes, searchValue]);
 

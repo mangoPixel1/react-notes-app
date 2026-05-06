@@ -17,8 +17,15 @@ function NoteCard({
   variant = "default",
 }) {
   const { isDark } = useContext(UIContext);
-  const { moveNoteToTrash, restoreNoteFromTrash, deleteNote, pinNote, unpinNote } =
-    useContext(NotesContext);
+  const {
+    moveNoteToTrash,
+    restoreNoteFromTrash,
+    deleteNote,
+    archiveNote,
+    unarchiveNote,
+    pinNote,
+    unpinNote,
+  } = useContext(NotesContext);
 
   const { border, lightBg, darkBg } = NOTE_COLOR_CLASSES[color];
   const colorClass = `p-3 ${border} ${isDark ? darkBg : lightBg}`;
@@ -50,6 +57,13 @@ function NoteCard({
                 Delete Forever
               </button>
             </>
+          ) : variant === "archived" ? (
+            <button
+              onClick={() => unarchiveNote(id)}
+              className="text-blue-600 hover:text-blue-700 cursor-pointer"
+            >
+              Unarchive
+            </button>
           ) : (
             <>
               {pinned ? (
@@ -61,6 +75,12 @@ function NoteCard({
                   Pin
                 </button>
               )}
+              <button
+                onClick={() => archiveNote(id)}
+                className="cursor-pointer hover:underline"
+              >
+                Archive
+              </button>
               <button
                 onClick={() => moveNoteToTrash(id)}
                 className="text-red-600 hover:text-red-700 cursor-pointer"

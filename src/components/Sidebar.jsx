@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link } from "react-router";
 import { Tooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
+
+import { AuthContext } from "../contexts/AuthContext";
 
 // Icons
 import {
@@ -12,14 +14,18 @@ import {
   Trash2,
   UserRound,
   Settings,
+  LogOut,
 } from "lucide-react";
 
 function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(true);
+  const { user, signOut } = useContext(AuthContext);
 
   const tooltipProps = !isExpanded
     ? { "data-tooltip-id": "sidebar-tooltip" }
     : {};
+
+  const displayName = user?.email ?? "";
 
   return (
     <>
@@ -83,11 +89,13 @@ function Sidebar() {
           <Link
             to="/profile"
             {...tooltipProps}
-            data-tooltip-content="Jane Doe"
+            data-tooltip-content={displayName}
             className={`${isExpanded && "w-full rounded-xl"} p-3 flex gap-3 hover:bg-orange-300 dark:hover:bg-amber-800 rounded-full cursor-pointer`}
           >
             <UserRound className="w-6 h-6 text-amber-600" />
-            {isExpanded && <span className="ml-2">Jane Doe</span>}
+            {isExpanded && (
+              <span className="ml-2 truncate text-sm">{displayName}</span>
+            )}
           </Link>
 
           <Link
@@ -99,6 +107,16 @@ function Sidebar() {
             <Settings className="w-6 h-6 text-amber-600" />
             {isExpanded && <span className="ml-2">Settings</span>}
           </Link>
+
+          <button
+            onClick={signOut}
+            {...tooltipProps}
+            data-tooltip-content="Sign out"
+            className={`${isExpanded && "w-full rounded-xl"} p-3 flex gap-3 hover:bg-orange-300 dark:hover:bg-amber-800 rounded-full cursor-pointer`}
+          >
+            <LogOut className="w-6 h-6 text-amber-600" />
+            {isExpanded && <span className="ml-2">Sign out</span>}
+          </button>
         </div>
       </aside>
 

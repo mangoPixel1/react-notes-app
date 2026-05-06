@@ -37,3 +37,10 @@ Defined in `src/components/MainContainer.jsx` using React Router v7:
 - **Icons** come from `lucide-react`; the `@iconify-json/solar` icon set is also available.
 - **Tailwind v4** is configured via the `@tailwindcss/vite` plugin — there is no separate `tailwind.config.js`; all customization goes through CSS variables in `src/index.css`.
 - Folder assignment: a note's `folderId` field links it to a folder; deleting a folder unassigns its notes (sets `folderId` to `null`).
+
+## Testing
+
+- Testing: Use Vitest + React Testing Library.
+- Test Files: Co-locate with components as `ComponentName.test.tsx`.
+- Mocking: Use MSW for Supabase API calls.
+- Command: `npm run test` to run all tests, `npm run test:ui` for the Vitest UI.

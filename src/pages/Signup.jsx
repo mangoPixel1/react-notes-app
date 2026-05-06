@@ -1,14 +1,16 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { useContext, useState } from "react";
+import { Link } from "react-router";
 
+import { AuthContext } from "../contexts/AuthContext";
 import Logo from "../icons/Logo";
 
 function Signup() {
-  const navigate = useNavigate();
+  const { signUp } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(e) {
@@ -24,13 +26,30 @@ function Signup() {
     setIsSubmitting(true);
     setError("");
     try {
-      // await supabase.auth.signUp({ email, password });
-      navigate("/dashboard");
+      await signUp(email, password);
+      setSuccess(true);
     } catch (err) {
       setError(err.message || "Sign up failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
+  }
+
+  if (success) {
+    return (
+      <div className="min-h-screen w-full flex justify-center items-center translate-y-[-40px]">
+        <div className="w-full max-w-72 space-y-4 text-center">
+          <Logo className="w-24 h-24 text-amber-500 mx-auto" />
+          <h2 className="text-2xl font-bold">Check your email</h2>
+          <p className="text-sm text-gray-500">
+            We sent a confirmation link to <strong>{email}</strong>. Click it to activate your account.
+          </p>
+          <Link to="/login" className="text-sm text-amber-700">
+            Back to Log in
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router";
 import { ArrowLeft, FolderClosed } from "lucide-react";
 
 import { NotesContext } from "../contexts/NotesContext";
+import { NOTE_STATUS } from "../constants";
 
 import NoteCard from "../components/NoteCard";
 import LayoutToggle from "../components/LayoutToggle";
@@ -13,7 +14,7 @@ function Folder() {
 
   const { notes, folders } = useContext(NotesContext);
   const folder = folders.find((f) => f.id === id);
-  const folderNotes = notes.filter((note) => note.folderId === id);
+  const folderNotes = notes.filter((note) => note.folderId === id && note.status === NOTE_STATUS.ACTIVE);
 
   return (
     <div className="space-y-4">
