@@ -28,17 +28,17 @@ function NoteCard({
   } = useContext(NotesContext);
 
   const { border, lightBg, darkBg } = NOTE_COLOR_CLASSES[color];
-  const colorClass = `p-3 ${border} ${isDark ? darkBg : lightBg}`;
+  const colorClass = `p-4 rounded-2xl shadow-md hover:shadow-lg transition-shadow backdrop-blur-sm ${border} ${isDark ? darkBg : lightBg}`;
 
   return (
     <div className={colorClass}>
       <Link to={`/note/${id}`} state={backLabel ? { backLabel } : undefined}>
-        <h1 className="font-semibold text-xl cursor-pointer hover:underline">
+        <h1 className="font-semibold text-lg cursor-pointer hover:underline line-clamp-2 mb-1">
           {title}
         </h1>
       </Link>
 
-      <p className="mb-4">{body}</p>
+      <p className="mb-4 text-sm line-clamp-4 text-gray-700 dark:text-gray-300">{body}</p>
       <div className="flex justify-between">
         <p className="text-sm text-gray-500 italic">{`Created: ${formatDateShort(creationDate)}`}</p>
         <div className="flex gap-2">

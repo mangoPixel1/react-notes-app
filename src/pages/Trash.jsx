@@ -21,6 +21,7 @@ function Trash() {
 
   return (
     <div className="space-y-4">
+      <div className="h-8" />
       <div className="flex items-center gap-4">
         <Trash2 className="w-10 h-10 text-gray-400" />
         <h1 className="font-bold text-4xl text-gray-500">Trash</h1>

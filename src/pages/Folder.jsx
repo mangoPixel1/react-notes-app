@@ -1,6 +1,8 @@
 import { useContext } from "react";
-import { Link, useParams } from "react-router";
-import { ArrowLeft, FolderClosed } from "lucide-react";
+import { useNavigate, useParams } from "react-router";
+import { FolderClosed } from "lucide-react";
+
+import BackButton from "../components/BackButton";
 
 import { NotesContext } from "../contexts/NotesContext";
 import { NOTE_STATUS } from "../constants";
@@ -11,6 +13,7 @@ import NotesGrid from "../components/NotesGrid";
 
 function Folder() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const { notes, folders } = useContext(NotesContext);
   const folder = folders.find((f) => f.id === id);
@@ -18,12 +21,7 @@ function Folder() {
 
   return (
     <div className="space-y-4">
-      <Link className="block" to="/folders">
-        <div className="flex items-center gap-2">
-          <ArrowLeft className="w-6 h-6 text-gray-400" />
-          <span>Back to Folders</span>
-        </div>
-      </Link>
+      <BackButton onClick={() => navigate("/folders")} label="Back to Folders" />
       <div className="flex items-center gap-4">
         <FolderClosed className="w-10 h-10 text-gray-400" />
         <h2 className="font-bold text-3xl text-gray-500">{folder?.name}</h2>
