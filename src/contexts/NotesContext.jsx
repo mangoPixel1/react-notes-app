@@ -1,396 +1,385 @@
-import { useReducer, createContext } from "react";
+import { createContext, useContext, useEffect, useReducer } from "react";
+import { NOTE_STATUS } from "../constants";
+import { supabase } from "../lib/supabase";
+import { toFolder, toNote } from "../utils/mappers";
+import { AuthContext } from "./AuthContext";
 
-// Allows components to access the context through useContext
+// eslint-disable-next-line react-refresh/only-export-components
 export const NotesContext = createContext();
 
+// Note shape: { id, title, body, color, pinned, status, folderId, creationDate, lastEdited, deletedAt }
+// Dates are ISO 8601 strings. folderId and deletedAt are null when unset.
 const initialState = {
-  notesList: [
-    {
-      id: crypto.randomUUID(),
-      creationDate: new Date("2025-03-14T09:32:00"),
-      lastEdited: new Date("2025-03-15T14:47:00"),
-      title: "Mushroom",
-      body: "A gray vegetable with an earthy flavor.",
-      color: "gray",
-      pinned: false,
-      status: "active",
-      folderId: null,
-      deletedAt: null,
-    },
-    {
-      id: crypto.randomUUID(),
-      creationDate: new Date("2025-04-02T11:20:00"),
-      lastEdited: new Date("2025-04-04T10:45:00"),
-      title: "Blueberry",
-      body: "A small blue fruit high in antioxidants.",
-      color: "blue",
-      pinned: true,
-      status: "active",
-      folderId: null,
-      deletedAt: null,
-    },
-    {
-      id: crypto.randomUUID(),
-      creationDate: new Date("2025-05-09T13:05:00"),
-      lastEdited: new Date("2025-05-10T09:15:00"),
-      title: "Carrot",
-      body: "A crunchy orange vegetable good for eyesight.",
-      color: "orange",
-      pinned: false,
-      status: "active",
-      folderId: null,
-      deletedAt: null,
-    },
-    {
-      id: crypto.randomUUID(),
-      creationDate: new Date("2025-06-18T16:42:00"),
-      lastEdited: new Date("2025-06-19T08:30:00"),
-      title: "Broccoli",
-      body: "A green vegetable packed with vitamins.",
-      color: "green",
-      pinned: false,
-      status: "active",
-      folderId: null,
-      deletedAt: null,
-    },
-    {
-      id: crypto.randomUUID(),
-      creationDate: new Date("2025-07-27T10:25:00"),
-      lastEdited: new Date("2025-07-29T12:50:00"),
-      title: "Apple",
-      body: "A sweet red fruit, crisp and juicy.",
-      color: "red",
-      pinned: true,
-      status: "active",
-      folderId: null,
-      deletedAt: null,
-    },
-    {
-      id: crypto.randomUUID(),
-      creationDate: new Date("2025-09-03T15:18:00"),
-      lastEdited: new Date("2025-09-05T09:22:00"),
-      title: "Banana",
-      body: "A soft yellow fruit rich in potassium.",
-      color: "yellow",
-      pinned: false,
-      status: "active",
-      folderId: null,
-      deletedAt: null,
-    },
-  ],
-  foldersList: [
-    {
-      id: crypto.randomUUID(),
-      name: "Recipes",
-    },
-    {
-      id: crypto.randomUUID(),
-      name: "Work",
-    },
-    {
-      id: crypto.randomUUID(),
-      name: "Personal",
-    },
-  ],
+  notesList: [],
+  foldersList: [],
+  isLoading: false,
+  error: null,
 };
 
-function notesReducer(state, action) {
+export function notesReducer(state, action) {
   switch (action.type) {
-    case "ADD_NOTE": {
-      const newDate = new Date();
-      const noteObj = {
-        id: crypto.randomUUID(),
-        creationDate: newDate,
-        lastEdited: newDate,
-        title: action.payload.title,
-        body: action.payload.body,
-        color: action.payload.color,
-        pinned: false,
-        status: "active",
-        folderId: action.payload.folderId || null,
-        deletedAt: null,
-      };
-      return { ...state, notesList: [...state.notesList, noteObj] };
-    }
-
-    case "EDIT_NOTE": {
-      const newEditDate = new Date();
-      const { id, title, body } = action.payload;
-
-      const trimmedTitle = title.trim();
-      const trimmedBody = body.trim();
-
-      if (!trimmedTitle && !trimmedBody) return state;
-
-      const updatedNotes = state.notesList.map((note) =>
-        note.id === id
-          ? {
-              ...note,
-              lastEdited: newEditDate,
-              title: trimmedTitle,
-              body: trimmedBody,
-            }
-          : note,
-      );
-      return { ...state, notesList: updatedNotes };
-    }
-
-    case "ARCHIVE_NOTE": {
-      const editDate = new Date();
+    case "SET_LOADING":
+      return { ...state, isLoading: action.payload };
+    case "SET_ERROR":
+      return { ...state, error: action.payload };
+    case "SET_NOTES":
+      return { ...state, notesList: action.payload };
+    case "SET_FOLDERS":
+      return { ...state, foldersList: action.payload };
+    case "ADD_NOTE":
+      return { ...state, notesList: [action.payload, ...state.notesList] };
+    case "UPDATE_NOTE":
       return {
         ...state,
-        notesList: state.notesList.map((note) =>
-          note.id === action.payload
-            ? { ...note, status: "archived", lastEdited: editDate }
-            : note,
+        notesList: state.notesList.map((n) =>
+          n.id === action.payload.id ? action.payload : n,
         ),
       };
-    }
-
-    case "UNARCHIVE_NOTE": {
-      const editDate = new Date();
+    case "DELETE_NOTE":
       return {
         ...state,
-        notesList: state.notesList.map((note) =>
-          note.id === action.payload
-            ? { ...note, status: "active", lastEdited: editDate }
-            : note,
-        ),
+        notesList: state.notesList.filter((n) => n.id !== action.payload),
       };
-    }
-
-    case "PIN_NOTE": {
-      const editDate = new Date();
+    case "ADD_FOLDER":
+      return { ...state, foldersList: [...state.foldersList, action.payload] };
+    case "UPDATE_FOLDER":
       return {
         ...state,
-        notesList: state.notesList.map((note) =>
-          note.id === action.payload
-            ? { ...note, pinned: true, lastEdited: editDate }
-            : note,
+        foldersList: state.foldersList.map((f) =>
+          f.id === action.payload.id ? action.payload : f,
         ),
       };
-    }
-
-    case "UNPIN_NOTE": {
-      const editDate = new Date();
+    // Deleting a folder unassigns its notes (sets folderId to null).
+    case "DELETE_FOLDER":
       return {
         ...state,
-        notesList: state.notesList.map((note) =>
-          note.id === action.payload
-            ? { ...note, pinned: false, lastEdited: editDate }
-            : note,
+        foldersList: state.foldersList.filter((f) => f.id !== action.payload),
+        notesList: state.notesList.map((n) =>
+          n.folderId === action.payload ? { ...n, folderId: null } : n,
         ),
       };
-    }
-
-    // Note is not permanently deleted, but moved to trash. It can be restored or permanently deleted from there.
-    case "MOVE_TO_TRASH": {
-      const deleteDate = new Date();
-      return {
-        ...state,
-        notesList: state.notesList.map((note) =>
-          note.id === action.payload
-            ? {
-                ...note,
-                status: "trashed",
-                deletedAt: deleteDate,
-                lastEdited: deleteDate,
-              }
-            : note,
-        ),
-      };
-    }
-
-    case "RESTORE_FROM_TRASH": {
-      const editDate = new Date();
-      return {
-        ...state,
-        notesList: state.notesList.map((note) =>
-          note.id === action.payload
-            ? {
-                ...note,
-                status: "active",
-                deletedAt: null,
-                lastEdited: editDate,
-              }
-            : note,
-        ),
-      };
-    }
-
-    // Permanently deletes note from state. This action is dispatched from Trash view when user chooses to permanently delete a note.
-    case "DELETE_NOTE": {
-      return {
-        ...state,
-        notesList: state.notesList.filter((note) => note.id !== action.payload),
-      };
-    }
-
-    // Add a new folder to the foldersList in state.
-    case "ADD_FOLDER": {
-      const newFolder = {
-        id: action.payload.id,
-        name: action.payload.name,
-      };
-      return { ...state, foldersList: [...state.foldersList, newFolder] };
-    }
-
-    // Edit an existing folder in the foldersList in state.
-    case "EDIT_FOLDER": {
-      const updatedFolders = state.foldersList.map((folder) =>
-        folder.id === action.payload.id
-          ? { ...folder, name: action.payload.name }
-          : folder,
-      );
-      return { ...state, foldersList: updatedFolders };
-    }
-
-    // Delete a folder from the foldersList in state. Also unassigns any notes that were in that folder (sets their folderId to null).
-    case "DELETE_FOLDER": {
-      return {
-        ...state,
-        foldersList: state.foldersList.filter(
-          (folder) => folder.id !== action.payload,
-        ),
-        notesList: state.notesList.map((note) =>
-          note.folderId === action.payload ? { ...note, folderId: null } : note,
-        ),
-      };
-    }
-
-    case "ADD_NOTE_TO_FOLDER": {
-      const { noteId, folderId } = action.payload;
-      const updatedNotes = state.notesList.map((note) =>
-        note.id === noteId ? { ...note, folderId: folderId } : note,
-      );
-      return { ...state, notesList: updatedNotes };
-    }
-
-    case "REMOVE_NOTE_FROM_FOLDER": {
-      const { noteId } = action.payload;
-      const updatedNotes = state.notesList.map((note) =>
-        note.id === noteId ? { ...note, folderId: null } : note,
-      );
-      return { ...state, notesList: updatedNotes };
-    }
-
     default:
       return state;
   }
 }
 
-// Makes context accessible to nested child components
 export function NotesProvider({ children }) {
   const [state, dispatch] = useReducer(notesReducer, initialState);
+  const { user } = useContext(AuthContext);
 
-  function addNote(newNote) {
-    dispatch({
-      type: "ADD_NOTE",
-      payload: {
-        title: newNote.title,
-        body: newNote.body,
-        color: newNote.color,
-        folderId: newNote.folderId,
-      },
-    });
+  useEffect(() => {
+    if (!user) {
+      dispatch({ type: "SET_NOTES", payload: [] });
+      dispatch({ type: "SET_FOLDERS", payload: [] });
+      return;
+    }
+
+    async function fetchData() {
+      dispatch({ type: "SET_LOADING", payload: true });
+      try {
+        const [notesRes, foldersRes] = await Promise.all([
+          supabase
+            .from("notes")
+            .select("*")
+            .order("created_at", { ascending: false }),
+          supabase
+            .from("folders")
+            .select("*")
+            .order("created_at", { ascending: true }),
+        ]);
+        if (notesRes.error) throw notesRes.error;
+        if (foldersRes.error) throw foldersRes.error;
+        dispatch({ type: "SET_NOTES", payload: notesRes.data.map(toNote) });
+        dispatch({
+          type: "SET_FOLDERS",
+          payload: foldersRes.data.map(toFolder),
+        });
+      } catch (err) {
+        dispatch({ type: "SET_ERROR", payload: err.message });
+      } finally {
+        dispatch({ type: "SET_LOADING", payload: false });
+      }
+    }
+
+    fetchData();
+  }, [user]);
+
+  async function addNote(newNote) {
+    dispatch({ type: "SET_LOADING", payload: true });
+    try {
+      const { data, error } = await supabase
+        .from("notes")
+        .insert({
+          title: newNote.title,
+          body: newNote.body,
+          color: newNote.color,
+          status: NOTE_STATUS.ACTIVE,
+          pinned: false,
+          folder_id: newNote.folderId ?? null,
+          user_id: user.id,
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      dispatch({ type: "ADD_NOTE", payload: toNote(data) });
+    } catch (err) {
+      dispatch({ type: "SET_ERROR", payload: err.message });
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
+    }
   }
 
-  function editNote(id, title, body) {
-    dispatch({
-      type: "EDIT_NOTE",
-      payload: {
-        id: id,
-        title: title,
-        body: body,
-      },
-    });
+  async function editNote(id, title, body) {
+    const trimmedTitle = title.trim();
+    const trimmedBody = body.trim();
+    if (!trimmedTitle && !trimmedBody) return;
+    dispatch({ type: "SET_LOADING", payload: true });
+    try {
+      const { data, error } = await supabase
+        .from("notes")
+        .update({
+          title: trimmedTitle,
+          body: trimmedBody,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) throw error;
+      dispatch({ type: "UPDATE_NOTE", payload: toNote(data) });
+    } catch (err) {
+      dispatch({ type: "SET_ERROR", payload: err.message });
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
+    }
   }
 
-  function archiveNote(id) {
-    dispatch({
-      type: "ARCHIVE_NOTE",
-      payload: id,
-    });
+  async function archiveNote(id) {
+    dispatch({ type: "SET_LOADING", payload: true });
+    try {
+      const { data, error } = await supabase
+        .from("notes")
+        .update({
+          status: NOTE_STATUS.ARCHIVED,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) throw error;
+      dispatch({ type: "UPDATE_NOTE", payload: toNote(data) });
+    } catch (err) {
+      dispatch({ type: "SET_ERROR", payload: err.message });
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
+    }
   }
 
-  function unarchiveNote(id) {
-    dispatch({
-      type: "UNARCHIVE_NOTE",
-      payload: id,
-    });
+  async function unarchiveNote(id) {
+    dispatch({ type: "SET_LOADING", payload: true });
+    try {
+      const { data, error } = await supabase
+        .from("notes")
+        .update({
+          status: NOTE_STATUS.ACTIVE,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) throw error;
+      dispatch({ type: "UPDATE_NOTE", payload: toNote(data) });
+    } catch (err) {
+      dispatch({ type: "SET_ERROR", payload: err.message });
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
+    }
   }
 
-  function pinNote(id) {
-    dispatch({
-      type: "PIN_NOTE",
-      payload: id,
-    });
+  async function pinNote(id) {
+    dispatch({ type: "SET_LOADING", payload: true });
+    try {
+      const { data, error } = await supabase
+        .from("notes")
+        .update({ pinned: true, updated_at: new Date().toISOString() })
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) throw error;
+      dispatch({ type: "UPDATE_NOTE", payload: toNote(data) });
+    } catch (err) {
+      dispatch({ type: "SET_ERROR", payload: err.message });
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
+    }
   }
 
-  function unpinNote(id) {
-    dispatch({
-      type: "UNPIN_NOTE",
-      payload: id,
-    });
+  async function unpinNote(id) {
+    dispatch({ type: "SET_LOADING", payload: true });
+    try {
+      const { data, error } = await supabase
+        .from("notes")
+        .update({ pinned: false, updated_at: new Date().toISOString() })
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) throw error;
+      dispatch({ type: "UPDATE_NOTE", payload: toNote(data) });
+    } catch (err) {
+      dispatch({ type: "SET_ERROR", payload: err.message });
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
+    }
   }
 
-  function moveNoteToTrash(id) {
-    dispatch({
-      type: "MOVE_TO_TRASH",
-      payload: id,
-    });
+  async function moveNoteToTrash(id) {
+    const now = new Date().toISOString();
+    dispatch({ type: "SET_LOADING", payload: true });
+    try {
+      const { data, error } = await supabase
+        .from("notes")
+        .update({
+          status: NOTE_STATUS.TRASHED,
+          deleted_at: now,
+          updated_at: now,
+        })
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) throw error;
+      dispatch({ type: "UPDATE_NOTE", payload: toNote(data) });
+    } catch (err) {
+      dispatch({ type: "SET_ERROR", payload: err.message });
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
+    }
   }
 
-  function restoreNoteFromTrash(id) {
-    dispatch({
-      type: "RESTORE_FROM_TRASH",
-      payload: id,
-    });
+  async function restoreNoteFromTrash(id) {
+    dispatch({ type: "SET_LOADING", payload: true });
+    try {
+      const { data, error } = await supabase
+        .from("notes")
+        .update({
+          status: NOTE_STATUS.ACTIVE,
+          deleted_at: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) throw error;
+      dispatch({ type: "UPDATE_NOTE", payload: toNote(data) });
+    } catch (err) {
+      dispatch({ type: "SET_ERROR", payload: err.message });
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
+    }
   }
 
-  function deleteNote(id) {
-    dispatch({
-      type: "DELETE_NOTE",
-      payload: id,
-    });
+  async function deleteNote(id) {
+    dispatch({ type: "SET_LOADING", payload: true });
+    try {
+      const { error } = await supabase.from("notes").delete().eq("id", id);
+      if (error) throw error;
+      dispatch({ type: "DELETE_NOTE", payload: id });
+    } catch (err) {
+      dispatch({ type: "SET_ERROR", payload: err.message });
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
+    }
   }
 
-  function addFolder(name) {
-    const id = crypto.randomUUID();
-    dispatch({
-      type: "ADD_FOLDER",
-      payload: { id, name },
-    });
-
-    return id;
+  async function addFolder(name) {
+    dispatch({ type: "SET_LOADING", payload: true });
+    try {
+      const { data, error } = await supabase
+        .from("folders")
+        .insert({ name, user_id: user.id })
+        .select()
+        .single();
+      if (error) throw error;
+      const folder = toFolder(data);
+      dispatch({ type: "ADD_FOLDER", payload: folder });
+      return folder.id;
+    } catch (err) {
+      dispatch({ type: "SET_ERROR", payload: err.message });
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
+    }
   }
 
-  function editFolder(id, name) {
-    dispatch({
-      type: "EDIT_FOLDER",
-      payload: { id, name },
-    });
+  async function editFolder(id, name) {
+    dispatch({ type: "SET_LOADING", payload: true });
+    try {
+      const { data, error } = await supabase
+        .from("folders")
+        .update({ name })
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) throw error;
+      dispatch({ type: "UPDATE_FOLDER", payload: toFolder(data) });
+    } catch (err) {
+      dispatch({ type: "SET_ERROR", payload: err.message });
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
+    }
   }
 
-  function deleteFolder(id) {
-    dispatch({
-      type: "DELETE_FOLDER",
-      payload: id,
-    });
+  async function deleteFolder(id) {
+    dispatch({ type: "SET_LOADING", payload: true });
+    try {
+      // Unassign notes first to avoid FK violation
+      const { error: unassignError } = await supabase
+        .from("notes")
+        .update({ folder_id: null })
+        .eq("folder_id", id);
+      if (unassignError) throw unassignError;
+      const { error } = await supabase.from("folders").delete().eq("id", id);
+      if (error) throw error;
+      dispatch({ type: "DELETE_FOLDER", payload: id });
+    } catch (err) {
+      dispatch({ type: "SET_ERROR", payload: err.message });
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
+    }
   }
 
-  function addNoteToFolder(noteId, folderId) {
-    dispatch({
-      type: "ADD_NOTE_TO_FOLDER",
-      payload: { noteId, folderId },
-    });
+  async function addNoteToFolder(noteId, folderId) {
+    dispatch({ type: "SET_LOADING", payload: true });
+    try {
+      const { data, error } = await supabase
+        .from("notes")
+        .update({ folder_id: folderId, updated_at: new Date().toISOString() })
+        .eq("id", noteId)
+        .select()
+        .single();
+      if (error) throw error;
+      dispatch({ type: "UPDATE_NOTE", payload: toNote(data) });
+    } catch (err) {
+      dispatch({ type: "SET_ERROR", payload: err.message });
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
+    }
   }
 
-  function removeNoteFromFolder(noteId) {
-    dispatch({
-      type: "REMOVE_NOTE_FROM_FOLDER",
-      payload: { noteId },
-    });
+  async function removeNoteFromFolder(noteId) {
+    dispatch({ type: "SET_LOADING", payload: true });
+    try {
+      const { data, error } = await supabase
+        .from("notes")
+        .update({ folder_id: null, updated_at: new Date().toISOString() })
+        .eq("id", noteId)
+        .select()
+        .single();
+      if (error) throw error;
+      dispatch({ type: "UPDATE_NOTE", payload: toNote(data) });
+    } catch (err) {
+      dispatch({ type: "SET_ERROR", payload: err.message });
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
+    }
   }
 
   return (
@@ -398,6 +387,8 @@ export function NotesProvider({ children }) {
       value={{
         notes: state.notesList,
         folders: state.foldersList,
+        isLoading: state.isLoading,
+        error: state.error,
         addNote,
         editNote,
         archiveNote,

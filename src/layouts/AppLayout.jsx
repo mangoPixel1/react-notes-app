@@ -15,7 +15,9 @@ export default function AppLayout() {
         <NewNoteModal />
 
         <main className="flex-1 p-6">
-          <Outlet />
+          <div className="max-w-7xl mx-auto">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

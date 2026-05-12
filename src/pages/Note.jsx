@@ -1,9 +1,12 @@
 import { useContext, useState, useEffect } from "react";
+import { useLocation, useNavigate, useParams } from "react-router";
 
-// Context
+import BackButton from "../components/BackButton";
+
 import { NotesContext } from "../contexts/NotesContext";
 import { UIContext } from "../contexts/UIContext";
-import { useLocation, useNavigate, useParams } from "react-router";
+import { NOTE_COLOR_CLASSES } from "../constants";
+import { formatDateFull } from "../utils/formatDate";
 
 function Note() {
   const { id } = useParams();
@@ -27,11 +30,9 @@ function Note() {
 
   const note = notes.find((currentNote) => currentNote.id === id) || null;
 
-  // Holds state for the edit form fields and tracks whether the note has been modified.
   const [editMode, setEditMode] = useState(false);
   const [editTitle, setEditTitle] = useState("");
   const [editBody, setEditBody] = useState("");
-
   const [noteModified, setNoteModified] = useState(false);
 
   const backLabel =
@@ -47,30 +48,23 @@ function Note() {
     navigate("/dashboard");
   }
 
-  // Save note edits only when content changed, then exit edit mode.
   function handleSaveChanges() {
     if (!note) return;
-
     if (noteModified) {
       editNote(note.id, editTitle, editBody);
     }
-    // Reset state
     setNoteModified(false);
     setEditMode(false);
   }
 
-  // Revert draft values back to note data and exit edit mode.
   function handleCancelChanges() {
     if (!note) return;
-
-    // Reset state
     setEditTitle(note.title);
     setEditBody(note.body);
     setNoteModified(false);
     setEditMode(false);
   }
 
-  // Move the note to trash and return to the previous page.
   function handleDeleteNote() {
     if (!note) return;
     moveNoteToTrash(note.id);
@@ -79,18 +73,16 @@ function Note() {
 
   function handleMoveToFolder(event) {
     if (!note) return;
-    const selectedFolderId = event.target.value; // selected value from dropdown
+    const selectedFolderId = event.target.value;
     if (!selectedFolderId) {
-      removeNoteFromFolder(note.id); // If "No folder" is selected, remove from any folder
+      removeNoteFromFolder(note.id);
       return;
     }
     addNoteToFolder(note.id, selectedFolderId);
   }
 
-  // Detects when the note has been modified
   useEffect(() => {
     if (!note) return;
-
     if (editMode && (note.title !== editTitle || note.body !== editBody)) {
       setNoteModified(true);
     } else {
@@ -98,7 +90,6 @@ function Note() {
     }
   }, [editTitle, editBody, editMode, note]);
 
-  // Initializes edit field values
   useEffect(() => {
     if (note) {
       setEditTitle(note.title);
@@ -109,194 +100,118 @@ function Note() {
     }
   }, [note]);
 
-  // Show a fallback state when the note id is no longer valid.
   if (!note) {
     return (
       <div className="mt-10 space-y-4">
+        <BackButton onClick={handleBackToNotes} label={backLabel} />
         <p className="text-gray-500 italic">This note no longer exists.</p>
-        <button
-          onClick={handleBackToNotes}
-          className="cursor-pointer hover:underline"
-        >
-          {backLabel}
-        </button>
       </div>
     );
   }
 
-  // Map note colors to light/dark styles for the note container.
-  const colorMap = {
-    yellow: isDark
-      ? "mt-3 p-3 border-2 border-yellow-400 bg-yellow-100 bg-zinc-700"
-      : "mt-3 p-3 border-2 border-yellow-400 bg-yellow-100",
-    red: isDark
-      ? "mt-3 p-3 border-2 border-red-400 bg-red-100 bg-zinc-700"
-      : "mt-3 p-3 border-2 border-red-400 bg-red-100",
-    green: isDark
-      ? "mt-3 p-3 border-2 border-green-400 bg-green-100 bg-zinc-700"
-      : "mt-3 p-3 border-2 border-green-400 bg-green-100",
-    orange: isDark
-      ? "mt-3 p-3 border-2 border-orange-400 bg-orange-100 bg-zinc-700"
-      : "mt-3 p-3 border-2 border-orange-400 bg-orange-100",
-    blue: isDark
-      ? "mt-3 p-3 border-2 border-blue-400 bg-blue-100 bg-zinc-700"
-      : "mt-3 p-3 border-2 border-blue-400 bg-blue-100",
-    gray: isDark
-      ? "mt-3 p-3 border-2 border-gray-400 bg-gray-100 bg-zinc-700"
-      : "mt-3 p-3 border-2 border-gray-400 bg-gray-100",
-  };
-
-  // Lookup tables for the page-level date/time formatter.
-  const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-  // Convert Date objects to the full "Day, Mon DD, YYYY at HH:MM" format.
-  function formatDateStr(date) {
-    const day = days[date.getDay()];
-    const month = months[date.getMonth()];
-    const dateNum = date.getDate();
-    const year = date.getFullYear();
-    const hour = date.getHours();
-    const minutes = date.getMinutes();
-
-    return `${day}, ${month} ${dateNum}, ${year} at ${hour
-      .toString()
-      .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
-  }
+  const { border, lightBg, darkBg } = NOTE_COLOR_CLASSES[note.color];
+  const colorClass = `p-6 rounded-2xl shadow-lg backdrop-blur-sm ${border} ${isDark ? darkBg : lightBg}`;
 
   return (
-    <div className="">
+    <div className="space-y-2">
       {editMode ? (
-        <>
-          <div className="flex justify-end">
-            <div className="space-x-2">
-              <button onClick={handleSaveChanges} className="cursor-pointer">
-                Save
-              </button>
-              <button onClick={handleCancelChanges} className="cursor-pointer">
-                Cancel
-              </button>
-            </div>
-          </div>
-          <div className={colorMap[note.color]}>
-            <form className="space-y-2">
-              <input
-                id="note-title"
-                type="text"
-                className="text-xl font-semibold block border-2 border-gray-400"
-                value={editTitle}
-                onChange={(e) => setEditTitle(e.target.value)}
-              />
-              <textarea
-                name="note-body"
-                id="note-body"
-                className="block border-2 border-gray-400"
-                value={editBody}
-                onChange={(e) => setEditBody(e.target.value)}
-              ></textarea>
-            </form>
-          </div>
-        </>
+        <div className="h-8" />
       ) : (
-        <>
-          <div className="flex justify-between">
-            <button
-              onClick={handleBackToNotes}
-              className="cursor-pointer hover:underline"
+        <BackButton onClick={handleBackToNotes} label={backLabel} />
+      )}
+
+      <div className="max-w-2xl mx-auto space-y-2">
+      {/* Actions row */}
+      <div className="flex justify-end items-center gap-2">
+        {editMode ? (
+          <>
+            <button onClick={handleSaveChanges} className="cursor-pointer text-sm">
+              Save
+            </button>
+            <button onClick={handleCancelChanges} className="cursor-pointer text-sm">
+              Cancel
+            </button>
+          </>
+        ) : (
+          <>
+            <select
+              className="rounded-md border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              value={note.folderId || ""}
+              onChange={handleMoveToFolder}
+              disabled={folders.length === 0}
             >
-              {backLabel}
+              <option value="">No folder</option>
+              {folders.map((folder) => (
+                <option key={folder.id} value={folder.id}>
+                  {folder.name}
+                </option>
+              ))}
+            </select>
+
+            <button onClick={() => setEditMode(true)} className="cursor-pointer text-sm">
+              Edit
             </button>
 
-            <div className="space-x-2">
-              <label className="inline-flex items-center gap-2">
-                <select
-                  className="rounded-md border border-gray-500 bg-white px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-zinc-800"
-                  value={note.folderId || ""}
-                  onChange={handleMoveToFolder}
-                  disabled={folders.length === 0}
-                >
-                  <option value="">No folder</option>
-                  {folders.map((folder) => (
-                    <option key={folder.id} value={folder.id}>
-                      {folder.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-
-              <button
-                onClick={() => setEditMode(true)}
-                className="cursor-pointer"
-              >
-                Edit
+            {note.status === "archived" ? (
+              <button onClick={() => unarchiveNote(note.id)} className="cursor-pointer text-sm">
+                Unarchive
               </button>
-
-              {note.status === "archived" ? (
-                <button
-                  onClick={() => unarchiveNote(note.id)}
-                  className="cursor-pointer"
-                >
-                  Unarchive
-                </button>
-              ) : (
-                <button
-                  onClick={() => archiveNote(note.id)}
-                  className="cursor-pointer"
-                >
-                  Archive
-                </button>
-              )}
-
-              {note.pinned ? (
-                <button
-                  onClick={() => unpinNote(note.id)}
-                  className="cursor-pointer"
-                >
-                  Unpin
-                </button>
-              ) : (
-                <button
-                  onClick={() => pinNote(note.id)}
-                  className="cursor-pointer"
-                >
-                  Pin
-                </button>
-              )}
-
-              <button
-                onClick={handleDeleteNote}
-                className="cursor-pointer text-red-600 hover:text-red-700"
-              >
-                Delete
+            ) : (
+              <button onClick={() => archiveNote(note.id)} className="cursor-pointer text-sm">
+                Archive
               </button>
-            </div>
-          </div>
+            )}
 
-          <div className={colorMap[note.color]}>
+            {note.pinned ? (
+              <button onClick={() => unpinNote(note.id)} className="cursor-pointer text-sm">
+                Unpin
+              </button>
+            ) : (
+              <button onClick={() => pinNote(note.id)} className="cursor-pointer text-sm">
+                Pin
+              </button>
+            )}
+
+            <button
+              onClick={handleDeleteNote}
+              className="cursor-pointer text-sm text-red-600 hover:text-red-700"
+            >
+              Delete
+            </button>
+          </>
+        )}
+      </div>
+
+      {/* Note card */}
+      <div className={colorClass}>
+        {editMode ? (
+          <form className="space-y-2">
+            <input
+              id="note-title"
+              type="text"
+              className="text-xl font-semibold block w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-white/60 dark:bg-zinc-900/60 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+            />
+            <textarea
+              name="note-body"
+              id="note-body"
+              rows={10}
+              className="block w-full rounded-lg border border-gray-300 dark:border-zinc-600 bg-white/60 dark:bg-zinc-900/60 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+              value={editBody}
+              onChange={(e) => setEditBody(e.target.value)}
+            />
+          </form>
+        ) : (
+          <>
             <h1 className="text-xl font-semibold">{note.title}</h1>
-            <p>{note.body}</p>
-            <p className="mt-5 text-sm text-gray-500 italic">{`Created: ${formatDateStr(
-              note.creationDate,
-            )}`}</p>
-            <p className="mt-2 text-sm text-gray-500 italic">{`Modified: ${formatDateStr(
-              note.lastEdited,
-            )}`}</p>
-          </div>
-        </>
-      )}
+            <p className="mt-1">{note.body}</p>
+            <p className="mt-5 text-sm text-gray-500 italic">{`Created: ${formatDateFull(note.creationDate)}`}</p>
+            <p className="mt-1 text-sm text-gray-500 italic">{`Modified: ${formatDateFull(note.lastEdited)}`}</p>
+          </>
+        )}
+      </div>
+      </div>
     </div>
   );
 }

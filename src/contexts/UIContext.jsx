@@ -1,5 +1,6 @@
 import { useState, useEffect, createContext } from "react";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const UIContext = createContext();
 
 export function UIProvider({ children }) {
@@ -7,6 +8,7 @@ export function UIProvider({ children }) {
   const [notesLayout, setNotesLayout] = useState("grid");
   const [addMode, setAddMode] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     const body = document.body;
@@ -25,6 +27,8 @@ export function UIProvider({ children }) {
         setAddMode,
         searchValue,
         setSearchValue,
+        mobileSidebarOpen,
+        setMobileSidebarOpen,
       }}
     >
       {children}

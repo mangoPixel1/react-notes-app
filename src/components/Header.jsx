@@ -1,36 +1,19 @@
 import { useContext } from "react";
 import { Link, useLocation } from "react-router";
 
-// Contexts
 import { UIContext } from "../contexts/UIContext";
+import { ADD_NOTE_PATHS } from "../constants";
 
-// Components
 import Search from "./Search";
-
-// Icons
 import Logo from "../icons/Logo";
-import {
-  Sun,
-  Moon,
-  RefreshCw,
-  CircleUserRound,
-  CirclePlus,
-} from "lucide-react";
+import { Sun, Moon, RefreshCw, CircleUserRound, CirclePlus, Menu } from "lucide-react";
 
 function Header() {
   const location = useLocation();
-  const canAddNote = ["/dashboard", "/folders"].includes(location.pathname);
+  const canAddNote = ADD_NOTE_PATHS.includes(location.pathname);
 
-  const {
-    isDark,
-    setIsDark,
-    notesLayout,
-    setNotesLayout,
-    addMode,
-    setAddMode,
-    searchValue,
-    setSearchValue,
-  } = useContext(UIContext);
+  const { isDark, setIsDark, addMode, setAddMode, searchValue, setSearchValue, setMobileSidebarOpen } =
+    useContext(UIContext);
 
   function toggleAddMode() {
     if (!addMode) {
@@ -38,14 +21,17 @@ function Header() {
     }
   }
 
-  function toggleLayoutView() {
-    notesLayout === "list" ? setNotesLayout("grid") : setNotesLayout("list");
-  }
-
   return (
     <header className="px-6 py-3 space-y-4">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
+          <button
+            className="md:hidden p-2 rounded-full hover:bg-orange-50 dark:hover:bg-orange-950 transition"
+            onClick={() => setMobileSidebarOpen(true)}
+          >
+            <Menu className="w-6 h-6 text-amber-500" />
+          </button>
+
           <Link to="/dashboard" className="flex items-center">
             <Logo className="w-14 h-14 text-amber-500" />
           </Link>
