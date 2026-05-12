@@ -5,6 +5,7 @@ import { NotesContext } from "../contexts/NotesContext";
 import { COLOR_SORT_ORDER, NOTE_STATUS } from "../constants";
 
 import NoteCard from "../components/NoteCard";
+import NoteCardSkeleton from "../components/NoteCardSkeleton";
 import LayoutToggle from "../components/LayoutToggle";
 import NotesGrid from "../components/NotesGrid";
 
@@ -12,7 +13,7 @@ import { Pin } from "lucide-react";
 
 function Dashboard() {
   const { searchValue } = useContext(UIContext);
-  const { notes } = useContext(NotesContext);
+  const { notes, isLoading } = useContext(NotesContext);
 
   const [sortOption, setSortOption] = useState("date-created-newest");
 
@@ -63,6 +64,23 @@ function Dashboard() {
         (note.body ?? "").toLowerCase().includes(searchValue.toLowerCase()),
     );
   }, [sortedNotes, searchValue]);
+
+  if (isLoading) {
+    return (
+      <div className="">
+        <div className="h-8" />
+        <div className="h-10 mb-4" />
+        <div>
+          <h2 className="text-lg font-semibold mb-2">All notes</h2>
+          <NotesGrid>
+            {Array.from({ length: 6 }, (_, i) => (
+              <NoteCardSkeleton key={i} />
+            ))}
+          </NotesGrid>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="">
