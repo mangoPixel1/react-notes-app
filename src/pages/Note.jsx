@@ -113,14 +113,14 @@ function Note() {
   const colorClass = `p-6 rounded-2xl shadow-lg backdrop-blur-sm ${border} ${isDark ? darkBg : lightBg}`;
 
   return (
-    <div className="max-w-2xl mx-auto space-y-2">
-      {/* Back button row — always reserved */}
+    <div className="space-y-2">
       {editMode ? (
         <div className="h-8" />
       ) : (
         <BackButton onClick={handleBackToNotes} label={backLabel} />
       )}
 
+      <div className="max-w-2xl mx-auto space-y-2">
       {/* Actions row */}
       <div className="flex justify-end items-center gap-2">
         {editMode ? (
@@ -210,6 +210,7 @@ function Note() {
             <p className="mt-1 text-sm text-gray-500 italic">{`Modified: ${formatDateFull(note.lastEdited)}`}</p>
           </>
         )}
+      </div>
       </div>
     </div>
   );
