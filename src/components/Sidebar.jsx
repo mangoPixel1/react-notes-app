@@ -4,8 +4,8 @@ import { Tooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
 
 import { AuthContext } from "../contexts/AuthContext";
+import { UIContext } from "../contexts/UIContext";
 
-// Icons
 import {
   Menu,
   House,
@@ -17,72 +17,83 @@ import {
   LogOut,
 } from "lucide-react";
 
+function NavLink({ to, label, tooltipProps, onNavigate, isExpanded, children }) {
+  return (
+    <Link
+      to={to}
+      {...tooltipProps}
+      data-tooltip-content={label}
+      onClick={onNavigate}
+      className={`
+        w-full rounded-xl p-3 flex gap-3
+        hover:bg-orange-300 dark:hover:bg-amber-800 cursor-pointer
+        ${!isExpanded && "md:w-auto md:rounded-full"}
+      `}
+    >
+      {children}
+      <span className={`ml-2 ${!isExpanded && "md:hidden"}`}>{label}</span>
+    </Link>
+  );
+}
+
 function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(true);
   const { user, signOut } = useContext(AuthContext);
+  const { mobileSidebarOpen, setMobileSidebarOpen } = useContext(UIContext);
 
-  const tooltipProps = !isExpanded
-    ? { "data-tooltip-id": "sidebar-tooltip" }
-    : {};
-
+  const tooltipProps = !isExpanded ? { "data-tooltip-id": "sidebar-tooltip" } : {};
   const displayName = user?.email ?? "";
+
+  function handleMenuClick() {
+    setIsExpanded((prev) => !prev);
+    setMobileSidebarOpen(false);
+  }
+
+  function closeMobile() {
+    setMobileSidebarOpen(false);
+  }
 
   return (
     <>
+      {/* Mobile backdrop */}
+      {mobileSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 z-30 md:hidden"
+          onClick={closeMobile}
+        />
+      )}
+
       <aside
-        className={`shrink-0 overflow-hidden bg-orange-200 dark:bg-amber-900 p-4
-  flex flex-col gap-6 h-screen sticky top-0 self-start
-  transition-[width] duration-300 ease-in-out
-  ${isExpanded ? "w-44 items-start" : "w-16 items-center"}
-`}
+        className={`
+          shrink-0 overflow-hidden bg-orange-200 dark:bg-amber-900 p-4
+          flex flex-col gap-6 h-screen items-start
+          fixed inset-y-0 left-0 z-40 w-56
+          transition-transform duration-300 ease-in-out
+          ${mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+          md:sticky md:top-0 md:self-start md:translate-x-0 md:transition-[width]
+          ${isExpanded ? "md:w-44 md:items-start" : "md:w-16 md:items-center"}
+        `}
       >
         <div
-          className="p-3 hover:bg-orange-300 dark:hover:bg-amber-800 rounded-full transition cursor-pointer"
-          onClick={() => setIsExpanded((prev) => !prev)}
+          className="p-3 hover:bg-orange-300 dark:hover:bg-amber-800 rounded-full transition cursor-pointer shrink-0"
+          onClick={handleMenuClick}
         >
           <Menu className="w-7 h-7 text-amber-600" />
         </div>
 
         <div className="w-full flex flex-col gap-3 items-center">
-          <Link
-            to="/dashboard"
-            {...tooltipProps}
-            data-tooltip-content="Home"
-            className={`${isExpanded && "w-full rounded-xl"} p-3 flex gap-3 hover:bg-orange-300 dark:hover:bg-amber-800 rounded-full cursor-pointer`}
-          >
-            <House className="w-6 h-6 text-amber-600" />
-            {isExpanded && <span className="ml-2">Home</span>}
-          </Link>
-
-          <Link
-            to="/folders"
-            {...tooltipProps}
-            data-tooltip-content="Folders"
-            className={`${isExpanded && "w-full rounded-xl"} p-3 flex gap-3 hover:bg-orange-300 dark:hover:bg-amber-800 rounded-full cursor-pointer`}
-          >
-            <FolderClosed className="w-6 h-6 text-amber-600" />
-            {isExpanded && <span className="ml-2">Folders</span>}
-          </Link>
-
-          <Link
-            to="/archived"
-            {...tooltipProps}
-            data-tooltip-content="Archived"
-            className={`${isExpanded && "w-full rounded-xl"} p-3 flex gap-3 hover:bg-orange-300 dark:hover:bg-amber-800 rounded-full cursor-pointer`}
-          >
-            <Archive className="w-6 h-6 text-amber-600" />
-            {isExpanded && <span className="ml-2">Archived</span>}
-          </Link>
-
-          <Link
-            to="/trash"
-            {...tooltipProps}
-            data-tooltip-content="Trash"
-            className={`${isExpanded && "w-full rounded-xl"} p-3 flex gap-3 hover:bg-orange-300 dark:hover:bg-amber-800 rounded-full cursor-pointer`}
-          >
-            <Trash2 className="w-6 h-6 text-amber-600" />
-            {isExpanded && <span className="ml-2">Trash</span>}
-          </Link>
+          <NavLink to="/dashboard" label="Home" tooltipProps={tooltipProps} onNavigate={closeMobile} isExpanded={isExpanded}>
+            <House className="w-6 h-6 text-amber-600 shrink-0" />
+          </NavLink>
+          <NavLink to="/folders" label="Folders" tooltipProps={tooltipProps} onNavigate={closeMobile} isExpanded={isExpanded}>
+            <FolderClosed className="w-6 h-6 text-amber-600 shrink-0" />
+          </NavLink>
+          <NavLink to="/archived" label="Archived" tooltipProps={tooltipProps} onNavigate={closeMobile} isExpanded={isExpanded}>
+            <Archive className="w-6 h-6 text-amber-600 shrink-0" />
+          </NavLink>
+          <NavLink to="/trash" label="Trash" tooltipProps={tooltipProps} onNavigate={closeMobile} isExpanded={isExpanded}>
+            <Trash2 className="w-6 h-6 text-amber-600 shrink-0" />
+          </NavLink>
         </div>
 
         <div className="w-full flex flex-col gap-3 items-center mt-auto">
@@ -90,37 +101,50 @@ function Sidebar() {
             to="/profile"
             {...tooltipProps}
             data-tooltip-content={displayName}
-            className={`${isExpanded && "w-full rounded-xl"} p-3 flex gap-3 hover:bg-orange-300 dark:hover:bg-amber-800 rounded-full cursor-pointer`}
+            onClick={closeMobile}
+            className={`
+              w-full rounded-xl p-3 flex gap-3
+              hover:bg-orange-300 dark:hover:bg-amber-800 cursor-pointer
+              ${!isExpanded && "md:w-auto md:rounded-full"}
+            `}
           >
-            <UserRound className="w-6 h-6 text-amber-600" />
-            {isExpanded && (
-              <span className="ml-2 truncate text-sm">{displayName}</span>
-            )}
+            <UserRound className="w-6 h-6 text-amber-600 shrink-0" />
+            <span className={`ml-2 truncate text-sm ${!isExpanded && "md:hidden"}`}>
+              {displayName}
+            </span>
           </Link>
 
           <Link
             to="/settings"
             {...tooltipProps}
             data-tooltip-content="Settings"
-            className={`${isExpanded && "w-full rounded-xl"} p-3 flex gap-3 hover:bg-orange-300 dark:hover:bg-amber-800 rounded-full cursor-pointer`}
+            onClick={closeMobile}
+            className={`
+              w-full rounded-xl p-3 flex gap-3
+              hover:bg-orange-300 dark:hover:bg-amber-800 cursor-pointer
+              ${!isExpanded && "md:w-auto md:rounded-full"}
+            `}
           >
-            <Settings className="w-6 h-6 text-amber-600" />
-            {isExpanded && <span className="ml-2">Settings</span>}
+            <Settings className="w-6 h-6 text-amber-600 shrink-0" />
+            <span className={`ml-2 ${!isExpanded && "md:hidden"}`}>Settings</span>
           </Link>
 
           <button
-            onClick={signOut}
+            onClick={() => { signOut(); closeMobile(); }}
             {...tooltipProps}
             data-tooltip-content="Sign out"
-            className={`${isExpanded && "w-full rounded-xl"} p-3 flex gap-3 hover:bg-orange-300 dark:hover:bg-amber-800 rounded-full cursor-pointer`}
+            className={`
+              w-full rounded-xl p-3 flex gap-3
+              hover:bg-orange-300 dark:hover:bg-amber-800 cursor-pointer
+              ${!isExpanded && "md:w-auto md:rounded-full"}
+            `}
           >
-            <LogOut className="w-6 h-6 text-amber-600" />
-            {isExpanded && <span className="ml-2">Sign out</span>}
+            <LogOut className="w-6 h-6 text-amber-600 shrink-0" />
+            <span className={`ml-2 ${!isExpanded && "md:hidden"}`}>Sign out</span>
           </button>
         </div>
       </aside>
 
-      {/* Tooltip instance */}
       {!isExpanded && (
         <Tooltip
           id="sidebar-tooltip"
