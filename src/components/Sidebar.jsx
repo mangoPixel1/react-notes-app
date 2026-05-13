@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { Link } from "react-router";
 import { Tooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
@@ -17,7 +17,7 @@ import {
   LogOut,
 } from "lucide-react";
 
-function NavLink({ to, label, tooltipProps, onNavigate, isExpanded, children }) {
+function NavLink({ to, label, tooltipProps, onNavigate, sidebarExpanded, children }) {
   return (
     <Link
       to={to}
@@ -27,25 +27,24 @@ function NavLink({ to, label, tooltipProps, onNavigate, isExpanded, children }) 
       className={`
         w-full rounded-xl p-3 flex gap-3
         hover:bg-orange-300 dark:hover:bg-amber-800 cursor-pointer
-        ${!isExpanded && "md:w-auto md:rounded-full"}
+        ${!sidebarExpanded && "md:w-auto md:rounded-full"}
       `}
     >
       {children}
-      <span className={`ml-2 ${!isExpanded && "md:hidden"}`}>{label}</span>
+      <span className={`ml-2 ${!sidebarExpanded && "md:hidden"}`}>{label}</span>
     </Link>
   );
 }
 
 function Sidebar() {
-  const [isExpanded, setIsExpanded] = useState(true);
   const { user, signOut } = useContext(AuthContext);
-  const { mobileSidebarOpen, setMobileSidebarOpen } = useContext(UIContext);
+  const { mobileSidebarOpen, setMobileSidebarOpen, sidebarExpanded, setSidebarExpanded } = useContext(UIContext);
 
-  const tooltipProps = !isExpanded ? { "data-tooltip-id": "sidebar-tooltip" } : {};
+  const tooltipProps = !sidebarExpanded ? { "data-tooltip-id": "sidebar-tooltip" } : {};
   const displayName = user?.email ?? "";
 
   function handleMenuClick() {
-    setIsExpanded((prev) => !prev);
+    setSidebarExpanded((prev) => !prev);
     setMobileSidebarOpen(false);
   }
 
@@ -71,7 +70,7 @@ function Sidebar() {
           transition-transform duration-300 ease-in-out
           ${mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"}
           md:sticky md:top-0 md:self-start md:translate-x-0 md:transition-[width]
-          ${isExpanded ? "md:w-44 md:items-start" : "md:w-16 md:items-center"}
+          ${sidebarExpanded ? "md:w-44 md:items-start" : "md:w-16 md:items-center"}
         `}
       >
         <div
@@ -82,16 +81,16 @@ function Sidebar() {
         </div>
 
         <div className="w-full flex flex-col gap-3 items-center">
-          <NavLink to="/dashboard" label="Home" tooltipProps={tooltipProps} onNavigate={closeMobile} isExpanded={isExpanded}>
+          <NavLink to="/dashboard" label="Home" tooltipProps={tooltipProps} onNavigate={closeMobile} sidebarExpanded={sidebarExpanded}>
             <House className="w-6 h-6 text-amber-600 shrink-0" />
           </NavLink>
-          <NavLink to="/folders" label="Folders" tooltipProps={tooltipProps} onNavigate={closeMobile} isExpanded={isExpanded}>
+          <NavLink to="/folders" label="Folders" tooltipProps={tooltipProps} onNavigate={closeMobile} sidebarExpanded={sidebarExpanded}>
             <FolderClosed className="w-6 h-6 text-amber-600 shrink-0" />
           </NavLink>
-          <NavLink to="/archived" label="Archived" tooltipProps={tooltipProps} onNavigate={closeMobile} isExpanded={isExpanded}>
+          <NavLink to="/archived" label="Archived" tooltipProps={tooltipProps} onNavigate={closeMobile} sidebarExpanded={sidebarExpanded}>
             <Archive className="w-6 h-6 text-amber-600 shrink-0" />
           </NavLink>
-          <NavLink to="/trash" label="Trash" tooltipProps={tooltipProps} onNavigate={closeMobile} isExpanded={isExpanded}>
+          <NavLink to="/trash" label="Trash" tooltipProps={tooltipProps} onNavigate={closeMobile} sidebarExpanded={sidebarExpanded}>
             <Trash2 className="w-6 h-6 text-amber-600 shrink-0" />
           </NavLink>
         </div>
@@ -105,11 +104,11 @@ function Sidebar() {
             className={`
               w-full rounded-xl p-3 flex gap-3
               hover:bg-orange-300 dark:hover:bg-amber-800 cursor-pointer
-              ${!isExpanded && "md:w-auto md:rounded-full"}
+              ${!sidebarExpanded && "md:w-auto md:rounded-full"}
             `}
           >
             <UserRound className="w-6 h-6 text-amber-600 shrink-0" />
-            <span className={`ml-2 truncate text-sm ${!isExpanded && "md:hidden"}`}>
+            <span className={`ml-2 truncate text-sm ${!sidebarExpanded && "md:hidden"}`}>
               {displayName}
             </span>
           </Link>
@@ -122,11 +121,11 @@ function Sidebar() {
             className={`
               w-full rounded-xl p-3 flex gap-3
               hover:bg-orange-300 dark:hover:bg-amber-800 cursor-pointer
-              ${!isExpanded && "md:w-auto md:rounded-full"}
+              ${!sidebarExpanded && "md:w-auto md:rounded-full"}
             `}
           >
             <Settings className="w-6 h-6 text-amber-600 shrink-0" />
-            <span className={`ml-2 ${!isExpanded && "md:hidden"}`}>Settings</span>
+            <span className={`ml-2 ${!sidebarExpanded && "md:hidden"}`}>Settings</span>
           </Link>
 
           <button
@@ -136,16 +135,16 @@ function Sidebar() {
             className={`
               w-full rounded-xl p-3 flex gap-3
               hover:bg-orange-300 dark:hover:bg-amber-800 cursor-pointer
-              ${!isExpanded && "md:w-auto md:rounded-full"}
+              ${!sidebarExpanded && "md:w-auto md:rounded-full"}
             `}
           >
             <LogOut className="w-6 h-6 text-amber-600 shrink-0" />
-            <span className={`ml-2 ${!isExpanded && "md:hidden"}`}>Sign out</span>
+            <span className={`ml-2 ${!sidebarExpanded && "md:hidden"}`}>Sign out</span>
           </button>
         </div>
       </aside>
 
-      {!isExpanded && (
+      {!sidebarExpanded && (
         <Tooltip
           id="sidebar-tooltip"
           place="right"
