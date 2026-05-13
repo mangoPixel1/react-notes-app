@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useReducer } from "react";
+import { createContext, useContext, useEffect, useReducer, useState } from "react";
 import { NOTE_STATUS } from "../constants";
 import { supabase } from "../lib/supabase";
 import { toFolder, toNote } from "../utils/mappers";
@@ -65,6 +65,7 @@ export function notesReducer(state, action) {
 
 export function NotesProvider({ children }) {
   const [state, dispatch] = useReducer(notesReducer, initialState);
+  const [isInitialLoad, setIsInitialLoad] = useState(false);
   const { user } = useContext(AuthContext);
 
   useEffect(() => {
@@ -75,6 +76,7 @@ export function NotesProvider({ children }) {
     }
 
     async function fetchData() {
+      setIsInitialLoad(true);
       dispatch({ type: "SET_LOADING", payload: true });
       try {
         const [notesRes, foldersRes] = await Promise.all([
@@ -98,6 +100,7 @@ export function NotesProvider({ children }) {
         dispatch({ type: "SET_ERROR", payload: err.message });
       } finally {
         dispatch({ type: "SET_LOADING", payload: false });
+        setIsInitialLoad(false);
       }
     }
 
@@ -388,6 +391,7 @@ export function NotesProvider({ children }) {
         notes: state.notesList,
         folders: state.foldersList,
         isLoading: state.isLoading,
+        isInitialLoad,
         error: state.error,
         addNote,
         editNote,

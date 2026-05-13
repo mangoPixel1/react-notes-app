@@ -13,7 +13,7 @@ import { Pin } from "lucide-react";
 
 function Dashboard() {
   const { searchValue } = useContext(UIContext);
-  const { notes, isLoading } = useContext(NotesContext);
+  const { notes, isInitialLoad } = useContext(NotesContext);
 
   const [sortOption, setSortOption] = useState("date-created-newest");
 
@@ -65,7 +65,7 @@ function Dashboard() {
     );
   }, [sortedNotes, searchValue]);
 
-  if (isLoading) {
+  if (isInitialLoad) {
     return (
       <div className="">
         <div className="h-8" />
