@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useReducer, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useReducer, useState } from "react";
 import { NOTE_STATUS } from "../constants";
 import { supabase } from "../lib/supabase";
 import { toFolder, toNote } from "../utils/mappers";
@@ -68,44 +68,43 @@ export function NotesProvider({ children }) {
   const [isInitialLoad, setIsInitialLoad] = useState(false);
   const { user } = useContext(AuthContext);
 
-  useEffect(() => {
+  const fetchData = useCallback(async () => {
     if (!user) {
       dispatch({ type: "SET_NOTES", payload: [] });
       dispatch({ type: "SET_FOLDERS", payload: [] });
       return;
     }
-
-    async function fetchData() {
-      setIsInitialLoad(true);
-      dispatch({ type: "SET_LOADING", payload: true });
-      try {
-        const [notesRes, foldersRes] = await Promise.all([
-          supabase
-            .from("notes")
-            .select("*")
-            .order("created_at", { ascending: false }),
-          supabase
-            .from("folders")
-            .select("*")
-            .order("created_at", { ascending: true }),
-        ]);
-        if (notesRes.error) throw notesRes.error;
-        if (foldersRes.error) throw foldersRes.error;
-        dispatch({ type: "SET_NOTES", payload: notesRes.data.map(toNote) });
-        dispatch({
-          type: "SET_FOLDERS",
-          payload: foldersRes.data.map(toFolder),
-        });
-      } catch (err) {
-        dispatch({ type: "SET_ERROR", payload: err.message });
-      } finally {
-        dispatch({ type: "SET_LOADING", payload: false });
-        setIsInitialLoad(false);
-      }
+    setIsInitialLoad(true);
+    dispatch({ type: "SET_LOADING", payload: true });
+    try {
+      const [notesRes, foldersRes] = await Promise.all([
+        supabase
+          .from("notes")
+          .select("*")
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("folders")
+          .select("*")
+          .order("created_at", { ascending: true }),
+      ]);
+      if (notesRes.error) throw notesRes.error;
+      if (foldersRes.error) throw foldersRes.error;
+      dispatch({ type: "SET_NOTES", payload: notesRes.data.map(toNote) });
+      dispatch({
+        type: "SET_FOLDERS",
+        payload: foldersRes.data.map(toFolder),
+      });
+    } catch (err) {
+      dispatch({ type: "SET_ERROR", payload: err.message });
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
+      setIsInitialLoad(false);
     }
-
-    fetchData();
   }, [user]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   async function addNote(newNote) {
     dispatch({ type: "SET_LOADING", payload: true });
@@ -407,6 +406,7 @@ export function NotesProvider({ children }) {
         deleteFolder,
         addNoteToFolder,
         removeNoteFromFolder,
+        refreshNotes: fetchData,
       }}
     >
       {children}

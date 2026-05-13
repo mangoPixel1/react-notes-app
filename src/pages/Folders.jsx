@@ -8,7 +8,7 @@ import { UIContext } from "../contexts/UIContext";
 import LayoutToggle from "../components/LayoutToggle";
 
 function Folders() {
-  const { notesLayout } = useContext(UIContext);
+  const { notesLayout, isDark } = useContext(UIContext);
   const { notes, folders, deleteFolder, editFolder, addFolder } =
     useContext(NotesContext);
 
@@ -65,7 +65,11 @@ function Folders() {
           {folders.map((folder) => (
             <div
               key={folder.id}
-              className="flex justify-between bg-white p-4 rounded-lg shadow"
+              className={
+                isDark
+                  ? "flex justify-between bg-zinc-700 p-4 rounded-lg shadow"
+                  : "flex justify-between bg-white p-4 rounded-lg shadow"
+              }
             >
               {editingFolderId === folder.id ? (
                 <input
@@ -88,7 +92,10 @@ function Folders() {
                 </h2>
               )}
               <div className="space-x-2">
-                <button onClick={() => handleEditClick(folder)} className="cursor-pointer">
+                <button
+                  onClick={() => handleEditClick(folder)}
+                  className="cursor-pointer"
+                >
                   Edit
                 </button>
                 <button

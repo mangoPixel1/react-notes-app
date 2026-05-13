@@ -2,6 +2,7 @@ import { useContext } from "react";
 import { Link, useLocation } from "react-router";
 
 import { UIContext } from "../contexts/UIContext";
+import { NotesContext } from "../contexts/NotesContext";
 import { ADD_NOTE_PATHS } from "../constants";
 
 import Search from "./Search";
@@ -14,6 +15,7 @@ function Header() {
 
   const { isDark, setIsDark, addMode, setAddMode, searchValue, setSearchValue, setMobileSidebarOpen } =
     useContext(UIContext);
+  const { refreshNotes, isLoading } = useContext(NotesContext);
 
   function toggleAddMode() {
     if (!addMode) {
@@ -48,8 +50,12 @@ function Header() {
               <CirclePlus className="w-6 h-6 text-amber-500" />
             </button>
           )}
-          <button className="fixed bottom-10 right-5 sm:static rounded-4xl px-2 py-2 cursor-pointer hover:bg-orange-50 dark:hover:bg-orange-950 transition duration-300">
-            <RefreshCw className="w-6 h-6 text-amber-500" />
+          <button
+            onClick={refreshNotes}
+            disabled={isLoading}
+            className="fixed bottom-10 right-5 sm:static rounded-4xl px-2 py-2 cursor-pointer hover:bg-orange-50 dark:hover:bg-orange-950 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <RefreshCw className={`w-6 h-6 text-amber-500 ${isLoading ? "animate-spin" : ""}`} />
           </button>
           <button
             onClick={() => setIsDark(!isDark)}
