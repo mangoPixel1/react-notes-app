@@ -15,6 +15,8 @@ import {
   UserRound,
   Settings,
   LogOut,
+  Sun,
+  Moon,
 } from "lucide-react";
 
 function NavLink({ to, label, tooltipProps, onNavigate, sidebarExpanded, children }) {
@@ -38,7 +40,7 @@ function NavLink({ to, label, tooltipProps, onNavigate, sidebarExpanded, childre
 
 function Sidebar() {
   const { user, signOut } = useContext(AuthContext);
-  const { mobileSidebarOpen, setMobileSidebarOpen, sidebarExpanded, setSidebarExpanded } = useContext(UIContext);
+  const { mobileSidebarOpen, setMobileSidebarOpen, sidebarExpanded, setSidebarExpanded, isDark, setIsDark } = useContext(UIContext);
 
   const tooltipProps = !sidebarExpanded ? { "data-tooltip-id": "sidebar-tooltip" } : {};
   const displayName = user?.email ?? "";
@@ -96,6 +98,26 @@ function Sidebar() {
         </div>
 
         <div className="w-full flex flex-col gap-3 items-center mt-auto">
+          <button
+            onClick={() => setIsDark(!isDark)}
+            {...tooltipProps}
+            data-tooltip-content={isDark ? "Light mode" : "Dark mode"}
+            className={`
+              w-full rounded-xl p-3 flex gap-3
+              hover:bg-orange-300 dark:hover:bg-amber-800 cursor-pointer
+              ${!sidebarExpanded && "md:w-auto md:rounded-full"}
+            `}
+          >
+            {isDark ? (
+              <Sun className="w-6 h-6 text-amber-600 shrink-0" />
+            ) : (
+              <Moon className="w-6 h-6 text-amber-600 shrink-0" />
+            )}
+            <span className={`ml-2 ${!sidebarExpanded && "md:hidden"}`}>
+              {isDark ? "Light mode" : "Dark mode"}
+            </span>
+          </button>
+
           <Link
             to="/profile"
             {...tooltipProps}

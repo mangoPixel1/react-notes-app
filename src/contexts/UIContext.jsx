@@ -18,6 +18,7 @@ export function UIProvider({ children }) {
   const [sidebarExpanded, setSidebarExpanded] = useState(() => readStorage("ui:sidebarExpanded", true));
   const [addMode, setAddMode] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -51,6 +52,8 @@ export function UIProvider({ children }) {
         setAddMode,
         searchValue,
         setSearchValue,
+        searchOpen,
+        setSearchOpen,
         mobileSidebarOpen,
         setMobileSidebarOpen,
       }}

@@ -7,13 +7,13 @@ import { ADD_NOTE_PATHS } from "../constants";
 
 import Search from "./Search";
 import Logo from "../icons/Logo";
-import { Sun, Moon, RefreshCw, CircleUserRound, CirclePlus, Menu } from "lucide-react";
+import { RefreshCw, CirclePlus, Menu, Search as SearchIcon, ArrowLeft } from "lucide-react";
 
 function Header() {
   const location = useLocation();
   const canAddNote = ADD_NOTE_PATHS.includes(location.pathname);
 
-  const { isDark, setIsDark, addMode, setAddMode, searchValue, setSearchValue, setMobileSidebarOpen } =
+  const { addMode, setAddMode, searchValue, setSearchValue, setMobileSidebarOpen, searchOpen, setSearchOpen } =
     useContext(UIContext);
   const { refreshNotes, isLoading } = useContext(NotesContext);
 
@@ -25,7 +25,23 @@ function Header() {
 
   return (
     <header className="px-6 py-3 space-y-4">
-      <div className="flex justify-between items-center">
+      {/* Mobile expanded search row */}
+      {searchOpen && (
+        <div className="flex items-center gap-3 md:hidden">
+          <button
+            className="p-2 rounded-full hover:bg-orange-50 dark:hover:bg-orange-950 transition"
+            onClick={() => { setSearchOpen(false); setSearchValue(""); }}
+          >
+            <ArrowLeft className="w-5 h-5 text-amber-500" />
+          </button>
+          <div className="flex-1">
+            <Search searchValue={searchValue} onChange={setSearchValue} autoFocus />
+          </div>
+        </div>
+      )}
+
+      {/* Main header row — hidden on mobile when search is open */}
+      <div className={`flex justify-between items-center ${searchOpen ? "hidden md:flex" : "flex"}`}>
         <div className="flex items-center gap-4">
           <button
             className="md:hidden p-2 rounded-full hover:bg-orange-50 dark:hover:bg-orange-950 transition"
@@ -38,10 +54,18 @@ function Header() {
             <Logo className="w-14 h-14 text-amber-500" />
           </Link>
 
-          <Search searchValue={searchValue} onChange={setSearchValue} />
+          <div className="hidden md:flex flex-1">
+            <Search searchValue={searchValue} onChange={setSearchValue} />
+          </div>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
+          <button
+            className="md:hidden px-2 py-2 rounded-4xl cursor-pointer hover:bg-orange-50 dark:hover:bg-orange-950 transition duration-300"
+            onClick={() => setSearchOpen(true)}
+          >
+            <SearchIcon className="w-6 h-6 text-amber-500" />
+          </button>
           {canAddNote && (
             <button
               onClick={toggleAddMode}
@@ -53,22 +77,9 @@ function Header() {
           <button
             onClick={refreshNotes}
             disabled={isLoading}
-            className="fixed bottom-10 right-5 sm:static rounded-4xl px-2 py-2 cursor-pointer hover:bg-orange-50 dark:hover:bg-orange-950 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded-4xl px-2 py-2 cursor-pointer hover:bg-orange-50 dark:hover:bg-orange-950 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <RefreshCw className={`w-6 h-6 text-amber-500 ${isLoading ? "animate-spin" : ""}`} />
-          </button>
-          <button
-            onClick={() => setIsDark(!isDark)}
-            className="px-2 py-2 rounded-4xl cursor-pointer hover:bg-orange-50 dark:hover:bg-orange-950 transition duration-300"
-          >
-            {isDark ? (
-              <Sun className="w-6 h-6 text-amber-500" />
-            ) : (
-              <Moon className="w-6 h-6 text-amber-500" />
-            )}
-          </button>
-          <button className="px-2 py-2 rounded-4xl cursor-pointer hover:bg-gray-50 dark:hover:bg-orange-950 transition duration-300">
-            <CircleUserRound className="w-8 h-8 text-gray-500 dark:text-gray-400" />
           </button>
         </div>
       </div>
