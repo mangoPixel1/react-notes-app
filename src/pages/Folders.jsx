@@ -54,7 +54,6 @@ function Folders() {
 
   return (
     <div className="space-y-4">
-      <div className="h-8" />
       <div className="flex items-center gap-3">
         <FolderClosed className="w-9 h-9 text-gray-400" />
         <h1 className="font-bold text-4xl text-gray-500">Folders</h1>

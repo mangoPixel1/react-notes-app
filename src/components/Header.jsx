@@ -41,7 +41,7 @@ function Header() {
       )}
 
       {/* Main header row — hidden on mobile when search is open */}
-      <div className={`flex justify-between items-center ${searchOpen ? "hidden md:flex" : "flex"}`}>
+      <div className={`relative flex justify-between items-center ${searchOpen ? "hidden md:flex" : "flex"}`}>
         <div className="flex items-center gap-4">
           <button
             className="md:hidden p-2 rounded-full hover:bg-orange-50 dark:hover:bg-orange-950 transition"
@@ -53,10 +53,10 @@ function Header() {
           <Link to="/dashboard" className="flex items-center">
             <Logo className="w-14 h-14 text-amber-500" />
           </Link>
+        </div>
 
-          <div className="hidden md:flex flex-1">
-            <Search searchValue={searchValue} onChange={setSearchValue} />
-          </div>
+        <div className="hidden md:block absolute left-1/2 -translate-x-1/2 w-[45%] max-w-xl">
+          <Search searchValue={searchValue} onChange={setSearchValue} />
         </div>
 
         <div className="flex gap-2 items-center">

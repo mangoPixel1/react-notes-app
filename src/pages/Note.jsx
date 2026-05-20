@@ -127,9 +127,7 @@ function Note() {
 
   return (
     <div className="space-y-2">
-      {editMode ? (
-        <div className="h-8" />
-      ) : (
+      {!editMode && (
         <BackButton onClick={handleBackToNotes} label={backLabel} />
       )}
 
