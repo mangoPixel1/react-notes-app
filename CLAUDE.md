@@ -2,6 +2,9 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## UI/UX Design
+Use a minimal, modern, Apple Glassmorphism-like aesthetic.
+
 ## Commands
 
 ```bash

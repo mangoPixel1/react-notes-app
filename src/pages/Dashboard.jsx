@@ -9,11 +9,11 @@ import NoteCardSkeleton from "../components/NoteCardSkeleton";
 import LayoutToggle from "../components/LayoutToggle";
 import NotesGrid from "../components/NotesGrid";
 
-import { Pin } from "lucide-react";
+import { Pin, Home } from "lucide-react";
 
 function Dashboard() {
   const { searchValue } = useContext(UIContext);
-  const { notes, isLoading } = useContext(NotesContext);
+  const { notes, isInitialLoad } = useContext(NotesContext);
 
   const [sortOption, setSortOption] = useState("date-created-newest");
 
@@ -56,22 +56,33 @@ function Dashboard() {
     [notes, sortNotes],
   );
 
+  const allActiveNotes = useMemo(
+    () =>
+      notes
+        .filter((note) => note.status === NOTE_STATUS.ACTIVE)
+        .sort(sortNotes),
+    [notes, sortNotes],
+  );
+
   const visibleNotes = useMemo(() => {
     if (!searchValue.trim()) return sortedNotes;
-    return sortedNotes.filter(
+    const query = searchValue.toLowerCase();
+    return allActiveNotes.filter(
       (note) =>
-        (note.title ?? "").toLowerCase().includes(searchValue.toLowerCase()) ||
-        (note.body ?? "").toLowerCase().includes(searchValue.toLowerCase()),
+        (note.title ?? "").toLowerCase().includes(query) ||
+        (note.body ?? "").toLowerCase().includes(query),
     );
-  }, [sortedNotes, searchValue]);
+  }, [allActiveNotes, sortedNotes, searchValue]);
 
-  if (isLoading) {
+  if (isInitialLoad) {
     return (
-      <div className="">
+      <div className="space-y-4">
         <div className="h-8" />
-        <div className="h-10 mb-4" />
+        <div className="flex items-center gap-4">
+          <Home className="w-10 h-10 text-gray-400" />
+          <h1 className="font-bold text-4xl text-gray-500">Home</h1>
+        </div>
         <div>
-          <h2 className="text-lg font-semibold mb-2">All notes</h2>
           <NotesGrid>
             {Array.from({ length: 6 }, (_, i) => (
               <NoteCardSkeleton key={i} />
@@ -83,11 +94,15 @@ function Dashboard() {
   }
 
   return (
-    <div className="">
-      <div className="h-8" />
+    <div className="space-y-4">
+      <div className="flex items-center gap-4">
+        <Home className="w-9 h-9 text-gray-400" />
+        <h1 className="font-bold text-4xl text-gray-500">Home</h1>
+      </div>
+
       <div className="flex gap-4">
         <LayoutToggle />
-        <div className="my-3">
+        <div className="flex items-center">
           <label htmlFor="sortBy" className="mr-2">
             Sort by:
           </label>
@@ -106,21 +121,19 @@ function Dashboard() {
         </div>
       </div>
 
-      <div>
-        {activePinnedNotes.length > 0 && (
-          <div className="mb-4">
-            <div className="flex items-center mb-2">
-              <Pin className="w-5 h-5 text-gray-500 mr-1" />
-              <h2 className="text-lg font-semibold">Pinned</h2>
-            </div>
-            <NotesGrid>
-              {activePinnedNotes.map((note) => (
-                <NoteCard key={note.id} {...note} />
-              ))}
-            </NotesGrid>
+      {searchValue.trim().length === 0 && activePinnedNotes.length > 0 && (
+        <div>
+          <div className="flex items-center mb-2">
+            <Pin className="w-5 h-5 text-gray-500 mr-1" />
+            <h2 className="text-lg font-semibold">Pinned</h2>
           </div>
-        )}
-      </div>
+          <NotesGrid>
+            {activePinnedNotes.map((note) => (
+              <NoteCard key={note.id} {...note} />
+            ))}
+          </NotesGrid>
+        </div>
+      )}
 
       <div>
         <h2 className="text-lg font-semibold mb-2">All notes</h2>

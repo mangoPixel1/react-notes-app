@@ -21,7 +21,6 @@ function Archived() {
 
   return (
     <div className="space-y-4">
-      <div className="h-8" />
       <div className="flex items-center gap-4">
         <Archive className="w-10 h-10 text-gray-400" />
         <h1 className="font-bold text-4xl text-gray-500">Archived</h1>
