@@ -1,6 +1,7 @@
 import { Outlet } from "react-router";
 import Header from "../components/Header";
 import NewNoteModal from "../components/NewNoteModal";
+import SearchModal from "../components/SearchModal";
 import Sidebar from "../components/Sidebar";
 
 export default function AppLayout() {
@@ -13,6 +14,7 @@ export default function AppLayout() {
       <div className="flex-1 flex flex-col">
         <Header />
         <NewNoteModal />
+        <SearchModal />
 
         <main className="flex-1 p-6">
           <div className="max-w-7xl mx-auto">

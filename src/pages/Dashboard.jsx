@@ -1,6 +1,5 @@
 import { useState, useContext, useMemo, useCallback } from "react";
 
-import { UIContext } from "../contexts/UIContext";
 import { NotesContext } from "../contexts/NotesContext";
 import { COLOR_SORT_ORDER, NOTE_STATUS } from "../constants";
 
@@ -12,7 +11,6 @@ import NotesGrid from "../components/NotesGrid";
 import { Pin, Home } from "lucide-react";
 
 function Dashboard() {
-  const { searchValue } = useContext(UIContext);
   const { notes, isInitialLoad } = useContext(NotesContext);
 
   const [sortOption, setSortOption] = useState("date-created-newest");
@@ -56,23 +54,6 @@ function Dashboard() {
     [notes, sortNotes],
   );
 
-  const allActiveNotes = useMemo(
-    () =>
-      notes
-        .filter((note) => note.status === NOTE_STATUS.ACTIVE)
-        .sort(sortNotes),
-    [notes, sortNotes],
-  );
-
-  const visibleNotes = useMemo(() => {
-    if (!searchValue.trim()) return sortedNotes;
-    const query = searchValue.toLowerCase();
-    return allActiveNotes.filter(
-      (note) =>
-        (note.title ?? "").toLowerCase().includes(query) ||
-        (note.body ?? "").toLowerCase().includes(query),
-    );
-  }, [allActiveNotes, sortedNotes, searchValue]);
 
   if (isInitialLoad) {
     return (
@@ -121,7 +102,7 @@ function Dashboard() {
         </div>
       </div>
 
-      {searchValue.trim().length === 0 && activePinnedNotes.length > 0 && (
+      {activePinnedNotes.length > 0 && (
         <div>
           <div className="flex items-center mb-2">
             <Pin className="w-5 h-5 text-gray-500 mr-1" />
@@ -138,7 +119,7 @@ function Dashboard() {
       <div>
         <h2 className="text-lg font-semibold mb-2">All notes</h2>
         <NotesGrid>
-          {visibleNotes.map((note) => (
+          {sortedNotes.map((note) => (
             <NoteCard key={note.id} {...note} />
           ))}
         </NotesGrid>
