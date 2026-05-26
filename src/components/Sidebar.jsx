@@ -64,6 +64,14 @@ function Sidebar() {
         />
       )}
 
+      {/* Fixed strip that stays pinned during Mac trackpad overscroll bounce */}
+      <div
+        aria-hidden="true"
+        className={`hidden md:block fixed inset-y-0 left-0 bg-orange-200 dark:bg-amber-900 z-30 transition-[width] duration-300 ease-in-out ${
+          sidebarExpanded ? "w-44" : "w-16"
+        }`}
+      />
+
       <aside
         className={`
           shrink-0 overflow-hidden bg-orange-200 dark:bg-amber-900 p-4
