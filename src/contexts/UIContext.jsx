@@ -20,12 +20,20 @@ export function UIProvider({ children }) {
   const [searchValue, setSearchValue] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [bodyVariant, setBodyVariant] = useState("landing");
 
   useEffect(() => {
     const body = document.body;
-    body.classList.toggle("bg-zinc-800", isDark);
-    body.classList.toggle("bg-white", !isDark);
-  }, [isDark]);
+    if (bodyVariant === "app") {
+      body.classList.remove("bg-white", "bg-zinc-800");
+      body.classList.toggle("bg-amber-900", isDark);
+      body.classList.toggle("bg-orange-200", !isDark);
+    } else {
+      body.classList.remove("bg-orange-200", "bg-amber-900");
+      body.classList.toggle("bg-zinc-800", isDark);
+      body.classList.toggle("bg-white", !isDark);
+    }
+  }, [isDark, bodyVariant]);
 
   useEffect(() => {
     try { localStorage.setItem("ui:isDark", JSON.stringify(isDark)); } catch (e) { void e; }
@@ -56,6 +64,7 @@ export function UIProvider({ children }) {
         setSearchOpen,
         mobileSidebarOpen,
         setMobileSidebarOpen,
+        setBodyVariant,
       }}
     >
       {children}

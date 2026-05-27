@@ -12,7 +12,7 @@ function Header() {
   const location = useLocation();
   const canAddNote = ADD_NOTE_PATHS.includes(location.pathname);
 
-  const { addMode, setAddMode, setMobileSidebarOpen, setSearchOpen, isDark } = useContext(UIContext);
+  const { addMode, setAddMode, setMobileSidebarOpen, setSearchOpen } = useContext(UIContext);
   const { refreshNotes, isLoading } = useContext(NotesContext);
 
   function toggleAddMode() {
@@ -22,7 +22,7 @@ function Header() {
   }
 
   return (
-    <header className="px-6 py-3">
+    <header className="px-6 py-3 bg-orange-200 dark:bg-amber-900">
       <div className="relative flex justify-between items-center">
         <div className="flex items-center gap-4">
           <button
@@ -40,11 +40,7 @@ function Header() {
         {/* Search trigger — desktop only, acts as a button */}
         <button
           onClick={() => setSearchOpen(true)}
-          className={`hidden md:flex items-center gap-2 absolute left-1/2 -translate-x-1/2 w-[45%] max-w-xl h-10 rounded-md px-4 cursor-pointer transition duration-200 hover:ring-2 hover:ring-amber-400 ${
-            isDark
-              ? "bg-amber-950 text-amber-700"
-              : "bg-orange-100 text-orange-400"
-          }`}
+          className="hidden md:flex items-center gap-2 absolute left-1/2 -translate-x-1/2 w-[45%] max-w-xl h-10 rounded-2xl px-4 cursor-pointer transition duration-200 border border-orange-200 dark:border-amber-800 hover:ring-2 hover:ring-amber-400 bg-white dark:bg-neutral-900 text-orange-400 dark:text-amber-600"
         >
           <SearchIcon className="w-4 h-4 shrink-0" />
           <span className="text-sm">Search notes…</span>
