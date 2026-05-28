@@ -18,7 +18,7 @@ import BackButton from "../components/BackButton";
 
 import { NotesContext } from "../contexts/NotesContext";
 import { UIContext } from "../contexts/UIContext";
-import { NOTE_COLOR_CLASSES } from "../constants";
+import { NOTE_COLOR_CLASSES, NOTE_STATUS } from "../constants";
 import { formatDateFull } from "../utils/formatDate";
 
 function Note() {
@@ -30,16 +30,14 @@ function Note() {
     notes,
     folders,
     editNote,
-    archiveNote,
     unarchiveNote,
     pinNote,
     unpinNote,
-    moveNoteToTrash,
     addNoteToFolder,
     removeNoteFromFolder,
   } = useContext(NotesContext);
 
-  const { isDark } = useContext(UIContext);
+  const { isDark, setConfirmAction } = useContext(UIContext);
 
   const note = notes.find((currentNote) => currentNote.id === id) || null;
 
@@ -80,8 +78,13 @@ function Note() {
 
   function handleDeleteNote() {
     if (!note) return;
-    moveNoteToTrash(note.id);
-    handleBackToNotes();
+    const action = note.status === NOTE_STATUS.TRASHED ? "delete" : "trash";
+    setConfirmAction({ action, noteId: note.id, onAfterConfirm: handleBackToNotes });
+  }
+
+  function handleArchiveNote() {
+    if (!note) return;
+    setConfirmAction({ action: "archive", noteId: note.id });
   }
 
   function handleMoveToFolder(event) {
@@ -196,7 +199,7 @@ function Note() {
                 </button>
               ) : (
                 <button
-                  onClick={() => archiveNote(note.id)}
+                  onClick={handleArchiveNote}
                   data-tooltip-id="note-actions-tooltip"
                   data-tooltip-content="Archive"
                   className="cursor-pointer p-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-zinc-700"
@@ -228,7 +231,7 @@ function Note() {
               <button
                 onClick={handleDeleteNote}
                 data-tooltip-id="note-actions-tooltip"
-                data-tooltip-content="Delete"
+                data-tooltip-content={note.status === NOTE_STATUS.TRASHED ? "Delete Forever" : "Delete"}
                 className="cursor-pointer p-2 rounded-lg transition-colors text-red-500 hover:text-red-600 hover:bg-gray-100 dark:hover:bg-zinc-700"
               >
                 <Trash2 size={18} />

@@ -19,6 +19,7 @@ export function UIProvider({ children }) {
   const [addMode, setAddMode] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [bodyVariant, setBodyVariant] = useState("landing");
 
@@ -65,6 +66,8 @@ export function UIProvider({ children }) {
         setSearchValue,
         searchOpen,
         setSearchOpen,
+        confirmAction,
+        setConfirmAction,
         mobileSidebarOpen,
         setMobileSidebarOpen,
         setBodyVariant,
