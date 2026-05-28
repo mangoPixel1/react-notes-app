@@ -28,8 +28,8 @@ function Folder() {
         label="Back to Folders"
       />
       <div className="flex items-center gap-4">
-        <FolderClosed className="w-9 h-9 text-gray-400" />
-        <h2 className="font-bold text-3xl text-gray-500">{folder?.name}</h2>
+        <FolderClosed className="w-10 h-10 text-gray-400 dark:text-gray-500" />
+        <h2 className="font-bold text-4xl text-gray-500 dark:text-gray-400">{folder?.name}</h2>
       </div>
 
       <div className="flex gap-4">

@@ -5,8 +5,8 @@ function SettingsPage() {
   return (
     <div>
       <div className="flex flex-col justify-center items-center gap-5">
-        <h1 className="font-bold text-4xl text-gray-500">Settings</h1>
-        <Settings className="w-16 h-16 text-gray-400" />
+        <h1 className="font-bold text-4xl text-gray-500 dark:text-gray-400">Settings</h1>
+        <Settings className="w-16 h-16 text-gray-400 dark:text-gray-500" />
       </div>
     </div>
   );

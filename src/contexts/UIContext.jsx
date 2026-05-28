@@ -23,13 +23,16 @@ export function UIProvider({ children }) {
   const [bodyVariant, setBodyVariant] = useState("landing");
 
   useEffect(() => {
+    document.documentElement.classList.toggle("dark", isDark);
+  }, [isDark]);
+
+  useEffect(() => {
     const body = document.body;
     if (bodyVariant === "app") {
       body.classList.remove("bg-white", "bg-zinc-800");
-      body.classList.toggle("bg-amber-900", isDark);
-      body.classList.toggle("bg-orange-200", !isDark);
+      body.classList.add("bg-chrome");
     } else {
-      body.classList.remove("bg-orange-200", "bg-amber-900");
+      body.classList.remove("bg-chrome");
       body.classList.toggle("bg-zinc-800", isDark);
       body.classList.toggle("bg-white", !isDark);
     }

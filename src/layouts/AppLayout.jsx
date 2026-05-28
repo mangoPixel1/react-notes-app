@@ -20,7 +20,7 @@ export default function AppLayout() {
       <Sidebar />
 
       {/* Main dashboard content */}
-      <div className="flex-1 flex flex-col bg-orange-200 dark:bg-amber-900">
+      <div className="flex-1 flex flex-col bg-chrome">
         <Header />
         <NewNoteModal />
         <SearchModal />
