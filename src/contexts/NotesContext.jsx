@@ -67,9 +67,10 @@ export function NotesProvider({ children }) {
   const [state, dispatch] = useReducer(notesReducer, initialState);
   const [isInitialLoad, setIsInitialLoad] = useState(false);
   const { user } = useContext(AuthContext);
+  const userId = user?.id ?? null;
 
   const fetchData = useCallback(async () => {
-    if (!user) {
+    if (!userId) {
       dispatch({ type: "SET_NOTES", payload: [] });
       dispatch({ type: "SET_FOLDERS", payload: [] });
       return;
@@ -100,7 +101,7 @@ export function NotesProvider({ children }) {
       dispatch({ type: "SET_LOADING", payload: false });
       setIsInitialLoad(false);
     }
-  }, [user]);
+  }, [userId]);
 
   useEffect(() => {
     fetchData();

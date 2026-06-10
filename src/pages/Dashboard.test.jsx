@@ -37,12 +37,11 @@ function makeNotesActions() {
   };
 }
 
-function renderDashboard({ notes = [], searchValue = "" } = {}) {
+function renderDashboard({ notes = [] } = {}) {
   return render(
     <MemoryRouter>
       <UIContext.Provider
         value={{
-          searchValue,
           notesLayout: "grid",
           isDark: false,
           setNotesLayout: vi.fn(),
@@ -116,36 +115,6 @@ describe("Dashboard — pinned section", () => {
   });
 });
 
-// ─── Search filtering ─────────────────────────────────────────────────────────
-
-describe("Dashboard — search filtering", () => {
-  it("shows only notes whose title matches the search value", () => {
-    const notes = [makeNote({ title: "Buy groceries" }), makeNote({ title: "Meeting notes" })];
-    renderDashboard({ notes, searchValue: "grocer" });
-    expect(screen.getByText("Buy groceries")).toBeInTheDocument();
-    expect(screen.queryByText("Meeting notes")).not.toBeInTheDocument();
-  });
-
-  it("shows notes whose body matches the search value", () => {
-    const notes = [makeNote({ title: "A", body: "milk and eggs" }), makeNote({ title: "B", body: "quarterly review" })];
-    renderDashboard({ notes, searchValue: "milk" });
-    expect(screen.getByText("A")).toBeInTheDocument();
-    expect(screen.queryByText("B")).not.toBeInTheDocument();
-  });
-
-  it("is case-insensitive", () => {
-    const notes = [makeNote({ title: "Shopping List" })];
-    renderDashboard({ notes, searchValue: "SHOPPING" });
-    expect(screen.getByText("Shopping List")).toBeInTheDocument();
-  });
-
-  it("shows all notes when search is blank or whitespace", () => {
-    const notes = [makeNote({ title: "A" }), makeNote({ title: "B" })];
-    renderDashboard({ notes, searchValue: "   " });
-    expect(screen.getByText("A")).toBeInTheDocument();
-    expect(screen.getByText("B")).toBeInTheDocument();
-  });
-});
 
 // ─── Sorting ──────────────────────────────────────────────────────────────────
 

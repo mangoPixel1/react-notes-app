@@ -49,14 +49,15 @@ function NewNoteModal() {
   if (!canAddNote || !addMode) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <button
-        aria-label="Close modal backdrop"
-        className="absolute inset-0 bg-black/40"
-        onClick={handleCancelNote}
-      />
-
-      <div className="relative w-full max-w-xl rounded-lg border border-zinc-200 bg-white p-6 shadow-xl dark:border-zinc-700 dark:bg-zinc-800">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center px-4"
+      style={{ backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)", backgroundColor: "rgba(0,0,0,0.25)" }}
+      onClick={handleCancelNote}
+    >
+      <div
+        className="relative w-full max-w-xl rounded-2xl border border-orange-100 bg-white p-6 shadow-2xl dark:border-zinc-700 dark:bg-zinc-800"
+        onClick={(e) => e.stopPropagation()}
+      >
         <h2 className="mb-4 text-lg font-semibold">Create new note</h2>
         <form className="space-y-4">
           <div className="space-y-2">

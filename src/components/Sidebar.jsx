@@ -19,7 +19,14 @@ import {
   Moon,
 } from "lucide-react";
 
-function NavLink({ to, label, tooltipProps, onNavigate, sidebarExpanded, children }) {
+function NavLink({
+  to,
+  label,
+  tooltipProps,
+  onNavigate,
+  sidebarExpanded,
+  children,
+}) {
   return (
     <Link
       to={to}
@@ -40,9 +47,18 @@ function NavLink({ to, label, tooltipProps, onNavigate, sidebarExpanded, childre
 
 function Sidebar() {
   const { user, signOut } = useContext(AuthContext);
-  const { mobileSidebarOpen, setMobileSidebarOpen, sidebarExpanded, setSidebarExpanded, isDark, setIsDark } = useContext(UIContext);
+  const {
+    mobileSidebarOpen,
+    setMobileSidebarOpen,
+    sidebarExpanded,
+    setSidebarExpanded,
+    isDark,
+    setIsDark,
+  } = useContext(UIContext);
 
-  const tooltipProps = !sidebarExpanded ? { "data-tooltip-id": "sidebar-tooltip" } : {};
+  const tooltipProps = !sidebarExpanded
+    ? { "data-tooltip-id": "sidebar-tooltip" }
+    : {};
   const displayName = user?.email ?? "";
 
   function handleMenuClick() {
@@ -64,9 +80,17 @@ function Sidebar() {
         />
       )}
 
+      {/* Fixed strip that stays pinned during Mac trackpad overscroll bounce */}
+      <div
+        aria-hidden="true"
+        className={`hidden md:block fixed inset-y-0 left-0 bg-chrome z-30 transition-[width] duration-300 ease-in-out ${
+          sidebarExpanded ? "w-44" : "w-16"
+        }`}
+      />
+
       <aside
         className={`
-          shrink-0 overflow-hidden bg-orange-200 dark:bg-amber-900 p-4
+          shrink-0 overflow-hidden bg-chrome p-4
           flex flex-col gap-6 h-screen items-start
           fixed inset-y-0 left-0 z-40 w-56
           transition-transform duration-300 ease-in-out
@@ -83,16 +107,40 @@ function Sidebar() {
         </div>
 
         <div className="w-full flex flex-col gap-3 items-center">
-          <NavLink to="/dashboard" label="Home" tooltipProps={tooltipProps} onNavigate={closeMobile} sidebarExpanded={sidebarExpanded}>
+          <NavLink
+            to="/dashboard"
+            label="Home"
+            tooltipProps={tooltipProps}
+            onNavigate={closeMobile}
+            sidebarExpanded={sidebarExpanded}
+          >
             <House className="w-6 h-6 text-amber-600 shrink-0" />
           </NavLink>
-          <NavLink to="/folders" label="Folders" tooltipProps={tooltipProps} onNavigate={closeMobile} sidebarExpanded={sidebarExpanded}>
+          <NavLink
+            to="/folders"
+            label="Folders"
+            tooltipProps={tooltipProps}
+            onNavigate={closeMobile}
+            sidebarExpanded={sidebarExpanded}
+          >
             <FolderClosed className="w-6 h-6 text-amber-600 shrink-0" />
           </NavLink>
-          <NavLink to="/archived" label="Archived" tooltipProps={tooltipProps} onNavigate={closeMobile} sidebarExpanded={sidebarExpanded}>
+          <NavLink
+            to="/archived"
+            label="Archived"
+            tooltipProps={tooltipProps}
+            onNavigate={closeMobile}
+            sidebarExpanded={sidebarExpanded}
+          >
             <Archive className="w-6 h-6 text-amber-600 shrink-0" />
           </NavLink>
-          <NavLink to="/trash" label="Trash" tooltipProps={tooltipProps} onNavigate={closeMobile} sidebarExpanded={sidebarExpanded}>
+          <NavLink
+            to="/trash"
+            label="Trash"
+            tooltipProps={tooltipProps}
+            onNavigate={closeMobile}
+            sidebarExpanded={sidebarExpanded}
+          >
             <Trash2 className="w-6 h-6 text-amber-600 shrink-0" />
           </NavLink>
         </div>
@@ -114,7 +162,7 @@ function Sidebar() {
               <Moon className="w-6 h-6 text-amber-600 shrink-0" />
             )}
             <span className={`ml-2 ${!sidebarExpanded && "md:hidden"}`}>
-              {isDark ? "Light mode" : "Dark mode"}
+              {isDark ? "Light" : "Dark"}
             </span>
           </button>
 
@@ -130,7 +178,9 @@ function Sidebar() {
             `}
           >
             <UserRound className="w-6 h-6 text-amber-600 shrink-0" />
-            <span className={`ml-2 truncate text-sm ${!sidebarExpanded && "md:hidden"}`}>
+            <span
+              className={`ml-2 truncate text-sm ${!sidebarExpanded && "md:hidden"}`}
+            >
               {displayName}
             </span>
           </Link>
@@ -147,11 +197,16 @@ function Sidebar() {
             `}
           >
             <Settings className="w-6 h-6 text-amber-600 shrink-0" />
-            <span className={`ml-2 ${!sidebarExpanded && "md:hidden"}`}>Settings</span>
+            <span className={`ml-2 ${!sidebarExpanded && "md:hidden"}`}>
+              Settings
+            </span>
           </Link>
 
           <button
-            onClick={() => { signOut(); closeMobile(); }}
+            onClick={() => {
+              signOut();
+              closeMobile();
+            }}
             {...tooltipProps}
             data-tooltip-content="Sign out"
             className={`
@@ -161,7 +216,9 @@ function Sidebar() {
             `}
           >
             <LogOut className="w-6 h-6 text-amber-600 shrink-0" />
-            <span className={`ml-2 ${!sidebarExpanded && "md:hidden"}`}>Sign out</span>
+            <span className={`ml-2 ${!sidebarExpanded && "md:hidden"}`}>
+              Sign out
+            </span>
           </button>
         </div>
       </aside>

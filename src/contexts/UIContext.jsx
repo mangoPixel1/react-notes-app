@@ -19,13 +19,25 @@ export function UIProvider({ children }) {
   const [addMode, setAddMode] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [bodyVariant, setBodyVariant] = useState("landing");
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", isDark);
+  }, [isDark]);
 
   useEffect(() => {
     const body = document.body;
-    body.classList.toggle("bg-zinc-800", isDark);
-    body.classList.toggle("bg-white", !isDark);
-  }, [isDark]);
+    if (bodyVariant === "app") {
+      body.classList.remove("bg-white", "bg-zinc-800");
+      body.classList.add("bg-chrome");
+    } else {
+      body.classList.remove("bg-chrome");
+      body.classList.toggle("bg-zinc-800", isDark);
+      body.classList.toggle("bg-white", !isDark);
+    }
+  }, [isDark, bodyVariant]);
 
   useEffect(() => {
     try { localStorage.setItem("ui:isDark", JSON.stringify(isDark)); } catch (e) { void e; }
@@ -54,8 +66,11 @@ export function UIProvider({ children }) {
         setSearchValue,
         searchOpen,
         setSearchOpen,
+        confirmAction,
+        setConfirmAction,
         mobileSidebarOpen,
         setMobileSidebarOpen,
+        setBodyVariant,
       }}
     >
       {children}

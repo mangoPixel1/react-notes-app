@@ -1,7 +1,16 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
-@theme {
+/* App chrome color — change here to update sidebar, header, and overscroll bg everywhere */
+:root {
+  --chrome-bg: theme(--color-orange-100);
+}
+.dark {
+  --chrome-bg: theme(--color-amber-900);
+}
+
+@theme inline {
+  --color-chrome: var(--chrome-bg);
   --color-grape: rgb(84, 8, 161);
 }
 

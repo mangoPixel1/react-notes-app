@@ -17,7 +17,7 @@ function NoteCard({
   backLabel,
   variant = "default",
 }) {
-  const { isDark } = useContext(UIContext);
+  const { isDark, setConfirmAction } = useContext(UIContext);
   const {
     moveNoteToTrash,
     restoreNoteFromTrash,
@@ -92,7 +92,7 @@ function NoteCard({
                     Restore
                   </button>
                   <button
-                    onClick={() => { deleteNote(id); setMenuOpen(false); }}
+                    onClick={() => { setConfirmAction({ action: "delete", noteId: id }); setMenuOpen(false); }}
                     className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer"
                   >
                     <Trash2 size={14} />
@@ -110,14 +110,14 @@ function NoteCard({
               ) : (
                 <>
                   <button
-                    onClick={() => { archiveNote(id); setMenuOpen(false); }}
+                    onClick={() => { setConfirmAction({ action: "archive", noteId: id }); setMenuOpen(false); }}
                     className="flex items-center gap-2 w-full px-3 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer"
                   >
                     <Archive size={14} />
                     Archive
                   </button>
                   <button
-                    onClick={() => { moveNoteToTrash(id); setMenuOpen(false); }}
+                    onClick={() => { setConfirmAction({ action: "trash", noteId: id }); setMenuOpen(false); }}
                     className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer"
                   >
                     <Trash2 size={14} />
@@ -129,6 +129,7 @@ function NoteCard({
           )}
         </div>
       </div>
+
     </div>
   );
 }

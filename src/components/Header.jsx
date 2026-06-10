@@ -5,15 +5,19 @@ import { UIContext } from "../contexts/UIContext";
 import { NotesContext } from "../contexts/NotesContext";
 import { ADD_NOTE_PATHS } from "../constants";
 
-import Search from "./Search";
 import Logo from "../icons/Logo";
-import { RefreshCw, CirclePlus, Menu, Search as SearchIcon, ArrowLeft } from "lucide-react";
+import {
+  RefreshCw,
+  CirclePlus,
+  Menu,
+  Search as SearchIcon,
+} from "lucide-react";
 
 function Header() {
   const location = useLocation();
   const canAddNote = ADD_NOTE_PATHS.includes(location.pathname);
 
-  const { addMode, setAddMode, searchValue, setSearchValue, setMobileSidebarOpen, searchOpen, setSearchOpen } =
+  const { addMode, setAddMode, setMobileSidebarOpen, setSearchOpen } =
     useContext(UIContext);
   const { refreshNotes, isLoading } = useContext(NotesContext);
 
@@ -24,24 +28,8 @@ function Header() {
   }
 
   return (
-    <header className="px-6 py-3 space-y-4">
-      {/* Mobile expanded search row */}
-      {searchOpen && (
-        <div className="flex items-center gap-3 md:hidden">
-          <button
-            className="p-2 rounded-full hover:bg-orange-50 dark:hover:bg-orange-950 transition"
-            onClick={() => { setSearchOpen(false); setSearchValue(""); }}
-          >
-            <ArrowLeft className="w-5 h-5 text-amber-500" />
-          </button>
-          <div className="flex-1">
-            <Search searchValue={searchValue} onChange={setSearchValue} autoFocus />
-          </div>
-        </div>
-      )}
-
-      {/* Main header row — hidden on mobile when search is open */}
-      <div className={`relative flex justify-between items-center ${searchOpen ? "hidden md:flex" : "flex"}`}>
+    <header className="px-6 py-3 bg-chrome">
+      <div className="relative flex justify-between items-center">
         <div className="flex items-center gap-4">
           <button
             className="md:hidden p-2 rounded-full hover:bg-orange-50 dark:hover:bg-orange-950 transition"
@@ -55,9 +43,14 @@ function Header() {
           </Link>
         </div>
 
-        <div className="hidden md:block absolute left-1/2 -translate-x-1/2 w-[45%] max-w-xl">
-          <Search searchValue={searchValue} onChange={setSearchValue} />
-        </div>
+        {/* Search trigger — desktop only, acts as a button */}
+        <button
+          onClick={() => setSearchOpen(true)}
+          className="hidden md:flex items-center gap-2 absolute left-1/2 -translate-x-1/2 w-[45%] max-w-xl h-10 rounded-2xl px-4 cursor-pointer transition duration-200 border border-orange-200 dark:border-amber-800 hover:ring-2 hover:ring-amber-400 bg-white dark:bg-zinc-800 text-orange-400 dark:text-amber-600"
+        >
+          <SearchIcon className="w-4 h-4 shrink-0" />
+          <span className="text-sm">Search notes…</span>
+        </button>
 
         <div className="flex gap-2 items-center">
           <button
@@ -79,7 +72,9 @@ function Header() {
             disabled={isLoading}
             className="rounded-4xl px-2 py-2 cursor-pointer hover:bg-orange-50 dark:hover:bg-orange-950 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <RefreshCw className={`w-6 h-6 text-amber-500 ${isLoading ? "animate-spin" : ""}`} />
+            <RefreshCw
+              className={`w-6 h-6 text-amber-500 ${isLoading ? "animate-spin" : ""}`}
+            />
           </button>
         </div>
       </div>
