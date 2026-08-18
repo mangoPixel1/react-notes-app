@@ -27,24 +27,15 @@ A full-stack notes app — folders, archiving, trash with restore, pinning, sear
 | Styling    | Tailwind CSS v4 |
 | Backend    | Supabase (Postgres, Auth) |
 | Icons      | lucide-react |
-| Testing    | Vitest, React Testing Library, MSW (mocked Supabase HTTP calls) |
 | Deployment | Vercel |
 
-## Testing
+## QA & Testing
 
-This project doubles as practice for manual and automated QA — the test suite covers reducers, contexts, and components:
+Manual and automated QA for this app — Playwright end-to-end tests and test documentation (test plans, checklists) — live in a companion repo:
 
-```bash
-npm run test        # run all tests once
-npm run test:watch  # re-run on file changes
-npm run test:ui     # open the Vitest browser UI
-```
+**[noto-qa](https://github.com/mangoPixel1/noto-qa)**
 
-- **Unit tests** — pure functions like the notes reducer and Supabase row/frontend mappers
-- **Context tests** — `NotesContext`/`UIContext` behavior via `renderHook`, with MSW intercepting Supabase REST calls instead of hitting a real database
-- **Component tests** — pages and components rendered with mocked context, verifying user interactions (e.g. selecting/restoring/deleting notes, changing settings) rather than implementation details
-
-Manual QA passes (auth edge cases, responsive breakpoints, cross-browser checks) are done directly against the deployed preview on each change.
+Keeping QA in its own repo mirrors how testing is often organized in real teams: independent from application code, with its own tooling and history.
 
 ## Getting started
 
@@ -72,8 +63,7 @@ src/
 ├── layouts/      # AppLayout (authenticated shell), LandingLayout
 ├── lib/          # Supabase client
 ├── pages/        # route-level views (Dashboard, Folders, Trash, Settings, ...)
-├── utils/        # mappers, date formatting
-└── test/         # MSW mock server and shared test setup
+└── utils/        # mappers, date formatting
 ```
 
-Routing, state management, and testing conventions are documented in [`CLAUDE.md`](./CLAUDE.md).
+Routing and state management conventions are documented in [`CLAUDE.md`](./CLAUDE.md).
