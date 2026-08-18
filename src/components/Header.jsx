@@ -6,6 +6,7 @@ import { NotesContext } from "../contexts/NotesContext";
 import { ADD_NOTE_PATHS } from "../constants";
 
 import Logo from "../icons/Logo";
+import ThemeToggle from "./ThemeToggle";
 import {
   RefreshCw,
   CirclePlus,
@@ -28,7 +29,7 @@ function Header() {
   }
 
   return (
-    <header className="px-6 py-3 bg-chrome">
+    <header className="sticky top-0 z-20 px-6 py-3 bg-chrome">
       <div className="relative flex justify-between items-center">
         <div className="flex items-center gap-4">
           <button
@@ -76,6 +77,7 @@ function Header() {
               className={`w-6 h-6 text-amber-500 ${isLoading ? "animate-spin" : ""}`}
             />
           </button>
+          <ThemeToggle />
         </div>
       </div>
     </header>

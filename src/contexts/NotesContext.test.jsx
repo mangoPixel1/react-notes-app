@@ -4,23 +4,26 @@ import { describe, it, expect, vi } from "vitest";
 import { http, HttpResponse } from "msw";
 import { NotesContext, NotesProvider } from "./NotesContext";
 import { AuthContext } from "./AuthContext";
+import { UIContext } from "./UIContext";
 import { server } from "../test/mocks/server";
 import { SUPABASE_URL, noteRow, folderRow } from "../test/mocks/handlers";
 
 const mockUser = { id: "user-1", email: "test@test.com" };
 
-function makeWrapper(user = mockUser) {
+function makeWrapper(user = mockUser, addToast = vi.fn()) {
   return function Wrapper({ children }) {
     return (
       <AuthContext.Provider value={{ user }}>
-        <NotesProvider>{children}</NotesProvider>
+        <UIContext.Provider value={{ addToast }}>
+          <NotesProvider>{children}</NotesProvider>
+        </UIContext.Provider>
       </AuthContext.Provider>
     );
   };
 }
 
-function renderNotes(user = mockUser) {
-  return renderHook(() => useContext(NotesContext), { wrapper: makeWrapper(user) });
+function renderNotes(user = mockUser, addToast = vi.fn()) {
+  return renderHook(() => useContext(NotesContext), { wrapper: makeWrapper(user, addToast) });
 }
 
 async function waitForIdle(result) {
@@ -260,6 +263,93 @@ describe("NotesContext — deleteNote", () => {
   });
 });
 
+// ─── restoreNotesFromTrash ────────────────────────────────────────────────────
+
+describe("NotesContext — restoreNotesFromTrash", () => {
+  it("sets status to active and clears deletedAt for all given ids", async () => {
+    const other = { ...noteRow, id: "note-2" };
+    server.use(
+      http.get(`${SUPABASE_URL}/rest/v1/notes`, () =>
+        HttpResponse.json([
+          { ...noteRow, status: "trashed", deleted_at: "2024-03-01T00:00:00Z" },
+          { ...other, status: "trashed", deleted_at: "2024-03-01T00:00:00Z" },
+        ])
+      ),
+      http.patch(`${SUPABASE_URL}/rest/v1/notes`, () =>
+        HttpResponse.json([
+          { ...noteRow, status: "active", deleted_at: null },
+          { ...other, status: "active", deleted_at: null },
+        ])
+      )
+    );
+    const { result } = renderNotes();
+    await waitForIdle(result);
+
+    await act(async () => {
+      await result.current.restoreNotesFromTrash(["note-1", "note-2"]);
+    });
+
+    await waitForIdle(result);
+    expect(result.current.notes.every((n) => n.status === "active")).toBe(true);
+    expect(result.current.notes.every((n) => n.deletedAt === null)).toBe(true);
+  });
+
+  it("does nothing when given an empty list", async () => {
+    const patchSpy = vi.fn();
+    server.use(
+      http.patch(`${SUPABASE_URL}/rest/v1/notes`, () => {
+        patchSpy();
+        return HttpResponse.json([]);
+      })
+    );
+    const { result } = renderNotes();
+    await waitForIdle(result);
+
+    await act(async () => { await result.current.restoreNotesFromTrash([]); });
+
+    expect(patchSpy).not.toHaveBeenCalled();
+  });
+});
+
+// ─── deleteNotes ──────────────────────────────────────────────────────────────
+
+describe("NotesContext — deleteNotes", () => {
+  it("removes all given ids from state", async () => {
+    const other = { ...noteRow, id: "note-2" };
+    server.use(
+      http.get(`${SUPABASE_URL}/rest/v1/notes`, () =>
+        HttpResponse.json([noteRow, other])
+      )
+    );
+    const { result } = renderNotes();
+    await waitForIdle(result);
+    expect(result.current.notes).toHaveLength(2);
+
+    await act(async () => {
+      await result.current.deleteNotes(["note-1", "note-2"]);
+    });
+
+    await waitForIdle(result);
+    expect(result.current.notes).toHaveLength(0);
+  });
+
+  it("does nothing when given an empty list", async () => {
+    const deleteSpy = vi.fn();
+    server.use(
+      http.delete(`${SUPABASE_URL}/rest/v1/notes`, () => {
+        deleteSpy();
+        return new HttpResponse(null, { status: 204 });
+      })
+    );
+    const { result } = renderNotes();
+    await waitForIdle(result);
+
+    await act(async () => { await result.current.deleteNotes([]); });
+
+    expect(deleteSpy).not.toHaveBeenCalled();
+  });
+});
+
 // ─── addFolder ────────────────────────────────────────────────────────────────
 
 describe("NotesContext — addFolder", () => {
@@ -336,6 +426,163 @@ describe("NotesContext — deleteFolder", () => {
     await act(async () => { await result.current.deleteFolder("folder-1"); });
 
     await waitForIdle(result);
+    expect(result.current.notes[0].folderId).toBe("folder-2");
+  });
+});
+
+// ─── toasts + undo ────────────────────────────────────────────────────────────
+
+function echoPatchHandler() {
+  return http.patch(`${SUPABASE_URL}/rest/v1/notes`, async ({ request }) => {
+    const url = new URL(request.url);
+    const idFilter = url.searchParams.get("id"); // e.g. "eq.note-2"
+    const id = idFilter?.startsWith("eq.") ? idFilter.slice(3) : noteRow.id;
+    const body = await request.json();
+    return HttpResponse.json({ ...noteRow, id, ...body });
+  });
+}
+
+describe("NotesContext — toasts", () => {
+  it("archiveNote shows an undoable toast, and undo unarchives the note", async () => {
+    server.use(echoPatchHandler());
+    const addToast = vi.fn();
+    const { result } = renderNotes(mockUser, addToast);
+    await waitForIdle(result);
+
+    await act(async () => { await result.current.archiveNote("note-1"); });
+    await waitForIdle(result);
+
+    expect(result.current.notes[0].status).toBe("archived");
+    expect(addToast).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "Note archived", actionLabel: "Undo" })
+    );
+
+    const { onAction } = addToast.mock.calls[0][0];
+    await act(async () => { await onAction(); });
+    await waitForIdle(result);
+
+    expect(result.current.notes[0].status).toBe("active");
+    expect(addToast).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "Note unarchived", actionLabel: "Undo" })
+    );
+  });
+
+  it("moveNoteToTrash shows an undoable toast, and undo restores the note", async () => {
+    server.use(echoPatchHandler());
+    const addToast = vi.fn();
+    const { result } = renderNotes(mockUser, addToast);
+    await waitForIdle(result);
+
+    await act(async () => { await result.current.moveNoteToTrash("note-1"); });
+    await waitForIdle(result);
+
+    expect(result.current.notes[0].status).toBe("trashed");
+    expect(addToast).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "Note moved to trash", actionLabel: "Undo" })
+    );
+
+    const { onAction } = addToast.mock.calls[0][0];
+    await act(async () => { await onAction(); });
+    await waitForIdle(result);
+
+    expect(result.current.notes[0].status).toBe("active");
+  });
+
+  it("deleteNote shows a toast with no undo action", async () => {
+    const addToast = vi.fn();
+    const { result } = renderNotes(mockUser, addToast);
+    await waitForIdle(result);
+
+    await act(async () => { await result.current.deleteNote("note-1"); });
+
+    expect(addToast).toHaveBeenCalledWith({ message: "Note deleted forever" });
+  });
+
+  it("restoreNotesFromTrash shows a pluralized toast and undo re-trashes every note", async () => {
+    const other = { ...noteRow, id: "note-2" };
+    server.use(
+      http.get(`${SUPABASE_URL}/rest/v1/notes`, () =>
+        HttpResponse.json([
+          { ...noteRow, status: "trashed", deleted_at: "2024-03-01T00:00:00Z" },
+          { ...other, status: "trashed", deleted_at: "2024-03-01T00:00:00Z" },
+        ])
+      ),
+      http.patch(`${SUPABASE_URL}/rest/v1/notes`, () =>
+        HttpResponse.json([
+          { ...noteRow, status: "active", deleted_at: null },
+          { ...other, status: "active", deleted_at: null },
+        ])
+      )
+    );
+    const addToast = vi.fn();
+    const { result } = renderNotes(mockUser, addToast);
+    await waitForIdle(result);
+
+    await act(async () => {
+      await result.current.restoreNotesFromTrash(["note-1", "note-2"]);
+    });
+    await waitForIdle(result);
+
+    expect(addToast).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "2 notes restored", actionLabel: "Undo" })
+    );
+
+    server.use(echoPatchHandler());
+    const { onAction } = addToast.mock.calls[0][0];
+    await act(async () => { await onAction(); });
+    await waitFor(() =>
+      expect(result.current.notes.every((n) => n.status === "trashed")).toBe(true)
+    );
+  });
+
+  it("deleteNotes shows a pluralized toast with no undo action", async () => {
+    const other = { ...noteRow, id: "note-2" };
+    server.use(
+      http.get(`${SUPABASE_URL}/rest/v1/notes`, () => HttpResponse.json([noteRow, other]))
+    );
+    const addToast = vi.fn();
+    const { result } = renderNotes(mockUser, addToast);
+    await waitForIdle(result);
+
+    await act(async () => { await result.current.deleteNotes(["note-1", "note-2"]); });
+
+    expect(addToast).toHaveBeenCalledWith({ message: "2 notes deleted forever" });
+  });
+
+  it("deleteFolder shows an undoable toast, and undo recreates the folder and reassigns its notes", async () => {
+    server.use(
+      http.get(`${SUPABASE_URL}/rest/v1/notes`, () =>
+        HttpResponse.json([{ ...noteRow, folder_id: "folder-1" }])
+      ),
+      http.post(`${SUPABASE_URL}/rest/v1/folders`, () =>
+        HttpResponse.json(
+          { id: "folder-2", name: folderRow.name, created_at: "2024-01-01T00:00:00Z", user_id: "user-1" },
+          { status: 201 }
+        )
+      ),
+      echoPatchHandler()
+    );
+    const addToast = vi.fn();
+    const { result } = renderNotes(mockUser, addToast);
+    await waitForIdle(result);
+
+    await act(async () => { await result.current.deleteFolder("folder-1"); });
+    await waitForIdle(result);
+
+    expect(result.current.folders).toHaveLength(0);
+    expect(addToast).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: `Folder "${folderRow.name}" deleted`,
+        actionLabel: "Undo",
+      })
+    );
+
+    const { onAction } = addToast.mock.calls[0][0];
+    await act(async () => { await onAction(); });
+    await waitForIdle(result);
+
+    expect(result.current.folders).toHaveLength(1);
+    expect(result.current.folders[0].name).toBe(folderRow.name);
     expect(result.current.notes[0].folderId).toBe("folder-2");
   });
 });

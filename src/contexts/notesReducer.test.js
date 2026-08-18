@@ -94,6 +94,45 @@ describe("notesReducer", () => {
     });
   });
 
+  describe("UPDATE_NOTES", () => {
+    it("replaces matching notes and leaves others untouched", () => {
+      const other = { ...baseNote, id: "n2", title: "Other" };
+      const updated = [
+        { ...baseNote, title: "Updated 1" },
+        { ...other, title: "Updated 2" },
+      ];
+      const state = notesReducer(
+        { ...emptyState, notesList: [baseNote, other] },
+        { type: "UPDATE_NOTES", payload: updated }
+      );
+      expect(state.notesList[0].title).toBe("Updated 1");
+      expect(state.notesList[1].title).toBe("Updated 2");
+      expect(state.notesList).toHaveLength(2);
+    });
+
+    it("ignores ids that aren't in the list", () => {
+      const state = notesReducer(
+        { ...emptyState, notesList: [baseNote] },
+        { type: "UPDATE_NOTES", payload: [{ ...baseNote, id: "does-not-exist" }] }
+      );
+      expect(state.notesList).toHaveLength(1);
+      expect(state.notesList[0]).toEqual(baseNote);
+    });
+  });
+
+  describe("DELETE_NOTES", () => {
+    it("removes all notes with matching ids", () => {
+      const other = { ...baseNote, id: "n2" };
+      const third = { ...baseNote, id: "n3" };
+      const state = notesReducer(
+        { ...emptyState, notesList: [baseNote, other, third] },
+        { type: "DELETE_NOTES", payload: ["n1", "n3"] }
+      );
+      expect(state.notesList).toHaveLength(1);
+      expect(state.notesList[0].id).toBe("n2");
+    });
+  });
+
   describe("ADD_FOLDER", () => {
     it("appends the folder to the list", () => {
       const state = notesReducer(emptyState, { type: "ADD_FOLDER", payload: baseFolder });

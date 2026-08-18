@@ -16,6 +16,9 @@ function NoteCard({
   creationDate,
   backLabel,
   variant = "default",
+  selectable = false,
+  selected = false,
+  onToggleSelect,
 }) {
   const { isDark, setConfirmAction } = useContext(UIContext);
   const {
@@ -48,6 +51,16 @@ function NoteCard({
 
   return (
     <div className={colorClass}>
+      {selectable && (
+        <input
+          type="checkbox"
+          checked={selected}
+          onChange={() => onToggleSelect(id)}
+          title={selected ? "Deselect" : "Select"}
+          className="absolute top-3 left-3 z-10 w-4 h-4 cursor-pointer accent-amber-500"
+        />
+      )}
+
       {variant === "default" && (
         <button
           onClick={() => (pinned ? unpinNote(id) : pinNote(id))}
@@ -59,7 +72,7 @@ function NoteCard({
       )}
 
       <Link to={`/note/${id}`} state={backLabel ? { backLabel } : undefined}>
-        <h1 className="font-semibold text-lg cursor-pointer hover:underline line-clamp-2 mb-1 pr-7">
+        <h1 className={`font-semibold text-lg cursor-pointer hover:underline line-clamp-2 mb-1 pr-7 ${selectable ? "pl-6" : ""}`}>
           {title}
         </h1>
       </Link>
