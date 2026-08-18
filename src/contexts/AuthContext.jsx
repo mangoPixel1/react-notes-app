@@ -24,8 +24,24 @@ export function AuthProvider({ children }) {
     if (error) throw error;
   }
 
-  async function signUp(email, password) {
-    const { error } = await supabase.auth.signUp({ email, password });
+  async function signUp(email, password, name) {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { name } },
+    });
+    if (error) throw error;
+  }
+
+  async function resetPasswordForEmail(email) {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) throw error;
+  }
+
+  async function updatePassword(newPassword) {
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
     if (error) throw error;
   }
 
@@ -42,6 +58,8 @@ export function AuthProvider({ children }) {
         signIn,
         signUp,
         signOut,
+        resetPasswordForEmail,
+        updatePassword,
       }}
     >
       {children}

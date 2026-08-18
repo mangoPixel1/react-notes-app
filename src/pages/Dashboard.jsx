@@ -1,6 +1,7 @@
 import { useState, useContext, useMemo, useCallback } from "react";
 
 import { NotesContext } from "../contexts/NotesContext";
+import { UIContext } from "../contexts/UIContext";
 import { COLOR_SORT_ORDER, NOTE_STATUS } from "../constants";
 
 import NoteCard from "../components/NoteCard";
@@ -12,8 +13,9 @@ import { Pin, Home } from "lucide-react";
 
 function Dashboard() {
   const { notes, isInitialLoad } = useContext(NotesContext);
+  const { defaultSortOrder } = useContext(UIContext);
 
-  const [sortOption, setSortOption] = useState("date-created-newest");
+  const [sortOption, setSortOption] = useState(defaultSortOrder);
 
   const sortNotes = useCallback(
     (a, b) => {

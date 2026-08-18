@@ -1,30 +1,49 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router";
 
 import { UIContext } from "../contexts/UIContext";
 import { NotesContext } from "../contexts/NotesContext";
-import { NOTE_COLORS, ADD_NOTE_PATHS } from "../constants";
+import { NOTE_COLORS, NOTE_COLOR_CLASSES, ADD_NOTE_PATHS } from "../constants";
+
+// Same palette as NOTE_COLOR_CLASSES but less translucent, so modal content stays legible.
+// Written out as literal class names (rather than derived at runtime) so Tailwind's
+// build-time scanner can find and generate them.
+const MODAL_COLOR_CLASSES = {
+  yellow: { light: "bg-yellow-100/95", dark: "bg-yellow-950/90" },
+  red: { light: "bg-red-100/95", dark: "bg-red-950/90" },
+  green: { light: "bg-green-100/95", dark: "bg-green-950/90" },
+  orange: { light: "bg-orange-100/95", dark: "bg-orange-950/90" },
+  blue: { light: "bg-blue-100/95", dark: "bg-blue-950/90" },
+  gray: { light: "bg-gray-50/95", dark: "bg-zinc-800/90" },
+};
 
 function NewNoteModal() {
   const location = useLocation();
   const canAddNote = ADD_NOTE_PATHS.includes(location.pathname);
-  const { addMode, setAddMode } = useContext(UIContext);
+  const { addMode, setAddMode, isDark, defaultNoteColor } = useContext(UIContext);
   const { folders, addNote } = useContext(NotesContext);
 
   const [newNoteData, setNewNoteData] = useState({
     title: "",
     body: "",
-    color: "",
+    color: defaultNoteColor,
     folderId: null,
   });
 
   const [error, setError] = useState("");
+  const titleInputRef = useRef(null);
 
   useEffect(() => {
     if (!canAddNote && addMode) {
       setAddMode(false);
     }
   }, [canAddNote, addMode, setAddMode]);
+
+  useEffect(() => {
+    if (canAddNote && addMode) {
+      titleInputRef.current?.focus();
+    }
+  }, [canAddNote, addMode]);
 
   function handleAddNote(e) {
     e.preventDefault();
@@ -36,17 +55,21 @@ function NewNoteModal() {
 
     addNote(newNoteData);
     setAddMode(false);
-    setNewNoteData({ title: "", body: "", color: "", folderId: null });
+    setNewNoteData({ title: "", body: "", color: defaultNoteColor, folderId: null });
     setError("");
   }
 
   function handleCancelNote() {
     setAddMode(false);
-    setNewNoteData({ title: "", body: "", color: "", folderId: null });
+    setNewNoteData({ title: "", body: "", color: defaultNoteColor, folderId: null });
     setError("");
   }
 
   if (!canAddNote || !addMode) return null;
+
+  const { border } = NOTE_COLOR_CLASSES[newNoteData.color];
+  const { light, dark } = MODAL_COLOR_CLASSES[newNoteData.color];
+  const modalBg = isDark ? dark : light;
 
   return (
     <div
@@ -55,13 +78,14 @@ function NewNoteModal() {
       onClick={handleCancelNote}
     >
       <div
-        className="relative w-full max-w-xl rounded-2xl border border-orange-100 bg-white p-6 shadow-2xl dark:border-zinc-700 dark:bg-zinc-800"
+        className={`relative w-full max-w-xl rounded-2xl p-6 shadow-2xl transition-colors duration-300 ${border} ${modalBg}`}
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="mb-4 text-lg font-semibold">Create new note</h2>
         <form className="space-y-4">
           <div className="space-y-2">
             <input
+              ref={titleInputRef}
               className={`block w-full rounded-md border px-3 py-2 ${
                 error && newNoteData.title === "" ? `border-red-600` : `border-gray-500`
               }`}
@@ -134,19 +158,19 @@ function NewNoteModal() {
 
           <p className="text-sm text-red-600">{error}</p>
 
-          <div className="flex gap-4">
-            <button
-              onClick={handleAddNote}
-              className="rounded-md bg-gray-200 px-3 py-2 transition duration-300 hover:bg-gray-300 dark:bg-zinc-600 dark:hover:bg-zinc-700 cursor-pointer"
-            >
-              Add Note
-            </button>
+          <div className="flex justify-end gap-3">
             <button
               type="button"
               onClick={handleCancelNote}
-              className="rounded-md bg-gray-200 px-3 py-2 transition duration-300 hover:bg-gray-300 dark:bg-zinc-600 dark:hover:bg-zinc-700 cursor-pointer"
+              className="cursor-pointer rounded-lg bg-zinc-100 px-4 py-2 text-sm font-medium transition hover:bg-zinc-200 dark:bg-zinc-700 dark:hover:bg-zinc-600"
             >
               Cancel
+            </button>
+            <button
+              onClick={handleAddNote}
+              className="cursor-pointer rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-amber-600"
+            >
+              Add Note
             </button>
           </div>
         </form>

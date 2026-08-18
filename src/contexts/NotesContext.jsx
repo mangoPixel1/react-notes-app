@@ -3,6 +3,7 @@ import { NOTE_STATUS } from "../constants";
 import { supabase } from "../lib/supabase";
 import { toFolder, toNote } from "../utils/mappers";
 import { AuthContext } from "./AuthContext";
+import { UIContext } from "./UIContext";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const NotesContext = createContext();
@@ -40,6 +41,20 @@ export function notesReducer(state, action) {
         ...state,
         notesList: state.notesList.filter((n) => n.id !== action.payload),
       };
+    case "UPDATE_NOTES": {
+      const updatedById = new Map(action.payload.map((n) => [n.id, n]));
+      return {
+        ...state,
+        notesList: state.notesList.map((n) => updatedById.get(n.id) ?? n),
+      };
+    }
+    case "DELETE_NOTES": {
+      const idsToDelete = new Set(action.payload);
+      return {
+        ...state,
+        notesList: state.notesList.filter((n) => !idsToDelete.has(n.id)),
+      };
+    }
     case "ADD_FOLDER":
       return { ...state, foldersList: [...state.foldersList, action.payload] };
     case "UPDATE_FOLDER":
@@ -67,6 +82,7 @@ export function NotesProvider({ children }) {
   const [state, dispatch] = useReducer(notesReducer, initialState);
   const [isInitialLoad, setIsInitialLoad] = useState(false);
   const { user } = useContext(AuthContext);
+  const { addToast } = useContext(UIContext);
   const userId = user?.id ?? null;
 
   const fetchData = useCallback(async () => {
@@ -125,6 +141,11 @@ export function NotesProvider({ children }) {
         .single();
       if (error) throw error;
       dispatch({ type: "ADD_NOTE", payload: toNote(data) });
+      addToast({
+        message: "Note added",
+        actionLabel: "Undo",
+        onAction: () => moveNoteToTrash(data.id),
+      });
     } catch (err) {
       dispatch({ type: "SET_ERROR", payload: err.message });
     } finally {
@@ -171,6 +192,11 @@ export function NotesProvider({ children }) {
         .single();
       if (error) throw error;
       dispatch({ type: "UPDATE_NOTE", payload: toNote(data) });
+      addToast({
+        message: "Note archived",
+        actionLabel: "Undo",
+        onAction: () => unarchiveNote(id),
+      });
     } catch (err) {
       dispatch({ type: "SET_ERROR", payload: err.message });
     } finally {
@@ -192,6 +218,11 @@ export function NotesProvider({ children }) {
         .single();
       if (error) throw error;
       dispatch({ type: "UPDATE_NOTE", payload: toNote(data) });
+      addToast({
+        message: "Note unarchived",
+        actionLabel: "Undo",
+        onAction: () => archiveNote(id),
+      });
     } catch (err) {
       dispatch({ type: "SET_ERROR", payload: err.message });
     } finally {
@@ -251,6 +282,11 @@ export function NotesProvider({ children }) {
         .single();
       if (error) throw error;
       dispatch({ type: "UPDATE_NOTE", payload: toNote(data) });
+      addToast({
+        message: "Note moved to trash",
+        actionLabel: "Undo",
+        onAction: () => restoreNoteFromTrash(id),
+      });
     } catch (err) {
       dispatch({ type: "SET_ERROR", payload: err.message });
     } finally {
@@ -273,6 +309,11 @@ export function NotesProvider({ children }) {
         .single();
       if (error) throw error;
       dispatch({ type: "UPDATE_NOTE", payload: toNote(data) });
+      addToast({
+        message: "Note restored",
+        actionLabel: "Undo",
+        onAction: () => moveNoteToTrash(id),
+      });
     } catch (err) {
       dispatch({ type: "SET_ERROR", payload: err.message });
     } finally {
@@ -286,6 +327,49 @@ export function NotesProvider({ children }) {
       const { error } = await supabase.from("notes").delete().eq("id", id);
       if (error) throw error;
       dispatch({ type: "DELETE_NOTE", payload: id });
+      addToast({ message: "Note deleted forever" });
+    } catch (err) {
+      dispatch({ type: "SET_ERROR", payload: err.message });
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
+    }
+  }
+
+  async function restoreNotesFromTrash(ids) {
+    if (!ids.length) return;
+    dispatch({ type: "SET_LOADING", payload: true });
+    try {
+      const { data, error } = await supabase
+        .from("notes")
+        .update({
+          status: NOTE_STATUS.ACTIVE,
+          deleted_at: null,
+          updated_at: new Date().toISOString(),
+        })
+        .in("id", ids)
+        .select();
+      if (error) throw error;
+      dispatch({ type: "UPDATE_NOTES", payload: data.map(toNote) });
+      addToast({
+        message: `${ids.length} note${ids.length === 1 ? "" : "s"} restored`,
+        actionLabel: "Undo",
+        onAction: () => Promise.all(ids.map((id) => moveNoteToTrash(id))),
+      });
+    } catch (err) {
+      dispatch({ type: "SET_ERROR", payload: err.message });
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
+    }
+  }
+
+  async function deleteNotes(ids) {
+    if (!ids.length) return;
+    dispatch({ type: "SET_LOADING", payload: true });
+    try {
+      const { error } = await supabase.from("notes").delete().in("id", ids);
+      if (error) throw error;
+      dispatch({ type: "DELETE_NOTES", payload: ids });
+      addToast({ message: `${ids.length} note${ids.length === 1 ? "" : "s"} deleted forever` });
     } catch (err) {
       dispatch({ type: "SET_ERROR", payload: err.message });
     } finally {
@@ -331,6 +415,11 @@ export function NotesProvider({ children }) {
   }
 
   async function deleteFolder(id) {
+    const folder = state.foldersList.find((f) => f.id === id);
+    const affectedNoteIds = state.notesList
+      .filter((n) => n.folderId === id)
+      .map((n) => n.id);
+
     dispatch({ type: "SET_LOADING", payload: true });
     try {
       // Unassign notes first to avoid FK violation
@@ -342,11 +431,24 @@ export function NotesProvider({ children }) {
       const { error } = await supabase.from("folders").delete().eq("id", id);
       if (error) throw error;
       dispatch({ type: "DELETE_FOLDER", payload: id });
+      if (folder) {
+        addToast({
+          message: `Folder "${folder.name}" deleted`,
+          actionLabel: "Undo",
+          onAction: () => undoDeleteFolder(folder.name, affectedNoteIds),
+        });
+      }
     } catch (err) {
       dispatch({ type: "SET_ERROR", payload: err.message });
     } finally {
       dispatch({ type: "SET_LOADING", payload: false });
     }
+  }
+
+  async function undoDeleteFolder(name, noteIds) {
+    const newFolderId = await addFolder(name);
+    if (!newFolderId) return;
+    await Promise.all(noteIds.map((noteId) => addNoteToFolder(noteId, newFolderId)));
   }
 
   async function addNoteToFolder(noteId, folderId) {
@@ -402,6 +504,8 @@ export function NotesProvider({ children }) {
         moveNoteToTrash,
         restoreNoteFromTrash,
         deleteNote,
+        restoreNotesFromTrash,
+        deleteNotes,
         addFolder,
         editFolder,
         deleteFolder,

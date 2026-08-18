@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { Tooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
 
@@ -12,11 +12,8 @@ import {
   FolderClosed,
   Archive,
   Trash2,
-  UserRound,
   Settings,
   LogOut,
-  Sun,
-  Moon,
 } from "lucide-react";
 
 function NavLink({
@@ -46,20 +43,18 @@ function NavLink({
 }
 
 function Sidebar() {
-  const { user, signOut } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const { signOut } = useContext(AuthContext);
   const {
     mobileSidebarOpen,
     setMobileSidebarOpen,
     sidebarExpanded,
     setSidebarExpanded,
-    isDark,
-    setIsDark,
   } = useContext(UIContext);
 
   const tooltipProps = !sidebarExpanded
     ? { "data-tooltip-id": "sidebar-tooltip" }
     : {};
-  const displayName = user?.email ?? "";
 
   function handleMenuClick() {
     setSidebarExpanded((prev) => !prev);
@@ -146,45 +141,6 @@ function Sidebar() {
         </div>
 
         <div className="w-full flex flex-col gap-3 items-center mt-auto">
-          <button
-            onClick={() => setIsDark(!isDark)}
-            {...tooltipProps}
-            data-tooltip-content={isDark ? "Light mode" : "Dark mode"}
-            className={`
-              w-full rounded-xl p-3 flex gap-3
-              hover:bg-orange-300 dark:hover:bg-amber-800 cursor-pointer
-              ${!sidebarExpanded && "md:w-auto md:rounded-full"}
-            `}
-          >
-            {isDark ? (
-              <Sun className="w-6 h-6 text-amber-600 shrink-0" />
-            ) : (
-              <Moon className="w-6 h-6 text-amber-600 shrink-0" />
-            )}
-            <span className={`ml-2 ${!sidebarExpanded && "md:hidden"}`}>
-              {isDark ? "Light" : "Dark"}
-            </span>
-          </button>
-
-          <Link
-            to="/profile"
-            {...tooltipProps}
-            data-tooltip-content={displayName}
-            onClick={closeMobile}
-            className={`
-              w-full rounded-xl p-3 flex gap-3
-              hover:bg-orange-300 dark:hover:bg-amber-800 cursor-pointer
-              ${!sidebarExpanded && "md:w-auto md:rounded-full"}
-            `}
-          >
-            <UserRound className="w-6 h-6 text-amber-600 shrink-0" />
-            <span
-              className={`ml-2 truncate text-sm ${!sidebarExpanded && "md:hidden"}`}
-            >
-              {displayName}
-            </span>
-          </Link>
-
           <Link
             to="/settings"
             {...tooltipProps}
@@ -204,8 +160,9 @@ function Sidebar() {
 
           <button
             onClick={() => {
-              signOut();
+              navigate("/", { replace: true });
               closeMobile();
+              signOut();
             }}
             {...tooltipProps}
             data-tooltip-content="Sign out"

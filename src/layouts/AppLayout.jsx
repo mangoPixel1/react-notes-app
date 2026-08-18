@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import NewNoteModal from "../components/NewNoteModal";
 import SearchModal from "../components/SearchModal";
 import ActionConfirmationModal from "../components/ActionConfirmationModal";
+import ToastContainer from "../components/ToastContainer";
 import Sidebar from "../components/Sidebar";
 import { UIContext } from "../contexts/UIContext";
 import { NotesContext } from "../contexts/NotesContext";
@@ -27,23 +28,43 @@ const ACTION_CONFIG = {
     confirmLabel: "Delete Forever",
     variant: "danger",
   },
+  deleteAccount: {
+    title: "Delete account?",
+    description: "All of your notes and folders will be permanently deleted. This cannot be undone.",
+    confirmLabel: "Delete Account",
+    variant: "danger",
+  },
 };
 
 export default function AppLayout() {
   const { setBodyVariant, confirmAction, setConfirmAction } = useContext(UIContext);
-  const { archiveNote, moveNoteToTrash, deleteNote } = useContext(NotesContext);
+  const { archiveNote, moveNoteToTrash, deleteNote, deleteNotes } = useContext(NotesContext);
 
   function handleConfirm() {
     if (!confirmAction) return;
-    const { action, noteId, onAfterConfirm } = confirmAction;
+    const { action, noteId, noteIds, onAfterConfirm } = confirmAction;
     if (action === "archive") archiveNote(noteId);
     else if (action === "trash") moveNoteToTrash(noteId);
     else if (action === "delete") deleteNote(noteId);
+    else if (action === "deleteMany") deleteNotes(noteIds);
+    else if (action === "deleteAccount") confirmAction.onConfirm?.();
     setConfirmAction(null);
     onAfterConfirm?.();
   }
 
-  const config = confirmAction ? ACTION_CONFIG[confirmAction.action] : {};
+  const config =
+    confirmAction?.action === "deleteMany"
+      ? {
+          title: "Delete notes permanently?",
+          description: `${confirmAction.noteIds.length} note${
+            confirmAction.noteIds.length === 1 ? "" : "s"
+          } will be deleted forever and cannot be recovered.`,
+          confirmLabel: "Delete Forever",
+          variant: "danger",
+        }
+      : confirmAction
+        ? ACTION_CONFIG[confirmAction.action]
+        : {};
 
   useEffect(() => {
     setBodyVariant("app");
@@ -54,6 +75,8 @@ export default function AppLayout() {
     <div className="flex min-h-screen">
       {/* Sidebar */}
       <Sidebar />
+
+      <ToastContainer />
 
       {/* Main dashboard content */}
       <div className="flex-1 flex flex-col bg-chrome">
