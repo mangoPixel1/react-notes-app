@@ -27,8 +27,11 @@ function ActionConfirmationModal({
       <div
         className="relative w-full max-w-sm rounded-2xl border border-orange-100 bg-white p-6 shadow-2xl dark:border-zinc-700 dark:bg-zinc-800"
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="confirm-action-title"
       >
-        <h2 className="mb-2 text-lg font-semibold">{title}</h2>
+        <h2 id="confirm-action-title" className="mb-2 text-lg font-semibold">{title}</h2>
         {description && (
           <p className="mb-6 text-sm text-zinc-500 dark:text-zinc-400">{description}</p>
         )}

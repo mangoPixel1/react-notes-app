@@ -143,6 +143,7 @@ function Note() {
                 onClick={handleSaveChanges}
                 data-tooltip-id="note-actions-tooltip"
                 data-tooltip-content="Save"
+                aria-label="Save"
                 className="cursor-pointer p-2 rounded-lg transition-colors text-green-700 dark:text-green-600 hover:bg-gray-100 dark:hover:bg-zinc-700"
               >
                 <Check size={18} />
@@ -151,6 +152,7 @@ function Note() {
                 onClick={handleCancelChanges}
                 data-tooltip-id="note-actions-tooltip"
                 data-tooltip-content="Cancel"
+                aria-label="Cancel"
                 className="cursor-pointer p-2 rounded-lg transition-colors text-red-700 dark:text-red-600 hover:bg-gray-100 dark:hover:bg-zinc-700"
               >
                 <X size={18} />
@@ -165,7 +167,11 @@ function Note() {
             </>
           ) : (
             <>
+              <label htmlFor="note-folder" className="sr-only">
+                Move to folder
+              </label>
               <select
+                id="note-folder"
                 className="rounded-md border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                 value={note.folderId || ""}
                 onChange={handleMoveToFolder}
@@ -183,6 +189,7 @@ function Note() {
                 onClick={() => setEditMode(true)}
                 data-tooltip-id="note-actions-tooltip"
                 data-tooltip-content="Edit"
+                aria-label="Edit"
                 className="cursor-pointer p-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-zinc-700"
               >
                 <Pencil size={18} />
@@ -193,6 +200,7 @@ function Note() {
                   onClick={() => unarchiveNote(note.id)}
                   data-tooltip-id="note-actions-tooltip"
                   data-tooltip-content="Unarchive"
+                  aria-label="Unarchive"
                   className="cursor-pointer p-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-zinc-700"
                 >
                   <ArchiveRestore size={18} />
@@ -202,6 +210,7 @@ function Note() {
                   onClick={handleArchiveNote}
                   data-tooltip-id="note-actions-tooltip"
                   data-tooltip-content="Archive"
+                  aria-label="Archive"
                   className="cursor-pointer p-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-zinc-700"
                 >
                   <Archive size={18} />
@@ -213,6 +222,7 @@ function Note() {
                   onClick={() => unpinNote(note.id)}
                   data-tooltip-id="note-actions-tooltip"
                   data-tooltip-content="Unpin"
+                  aria-label="Unpin"
                   className="cursor-pointer p-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-zinc-700"
                 >
                   <PinOff size={18} />
@@ -222,6 +232,7 @@ function Note() {
                   onClick={() => pinNote(note.id)}
                   data-tooltip-id="note-actions-tooltip"
                   data-tooltip-content="Pin"
+                  aria-label="Pin"
                   className="cursor-pointer p-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-zinc-700"
                 >
                   <Pin size={18} />
@@ -232,6 +243,7 @@ function Note() {
                 onClick={handleDeleteNote}
                 data-tooltip-id="note-actions-tooltip"
                 data-tooltip-content={note.status === NOTE_STATUS.TRASHED ? "Delete Forever" : "Delete"}
+                aria-label={note.status === NOTE_STATUS.TRASHED ? "Delete Forever" : "Delete"}
                 className="cursor-pointer p-2 rounded-lg transition-colors text-red-500 hover:text-red-600 hover:bg-gray-100 dark:hover:bg-zinc-700"
               >
                 <Trash2 size={18} />
@@ -251,6 +263,9 @@ function Note() {
         <div className={colorClass}>
           {editMode ? (
             <form className="space-y-2">
+              <label htmlFor="note-title" className="sr-only">
+                Title
+              </label>
               <input
                 id="note-title"
                 type="text"
@@ -258,6 +273,9 @@ function Note() {
                 value={editTitle}
                 onChange={(e) => setEditTitle(e.target.value)}
               />
+              <label htmlFor="note-body" className="sr-only">
+                Body
+              </label>
               <textarea
                 name="note-body"
                 id="note-body"

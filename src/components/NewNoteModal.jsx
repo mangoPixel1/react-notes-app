@@ -80,12 +80,19 @@ function NewNoteModal() {
       <div
         className={`relative w-full max-w-xl rounded-2xl p-6 shadow-2xl transition-colors duration-300 ${border} ${modalBg}`}
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="new-note-modal-title"
       >
-        <h2 className="mb-4 text-lg font-semibold">Create new note</h2>
+        <h2 id="new-note-modal-title" className="mb-4 text-lg font-semibold">Create new note</h2>
         <form className="space-y-4">
           <div className="space-y-2">
+            <label htmlFor="new-note-title" className="sr-only">
+              Title
+            </label>
             <input
               ref={titleInputRef}
+              id="new-note-title"
               className={`block w-full rounded-md border px-3 py-2 ${
                 error && newNoteData.title === "" ? `border-red-600` : `border-gray-500`
               }`}
@@ -96,12 +103,15 @@ function NewNoteModal() {
                 setNewNoteData((prev) => ({ ...prev, title: e.target.value }))
               }
             />
+            <label htmlFor="new-note-body" className="sr-only">
+              Body
+            </label>
             <textarea
               className={`block min-h-32 w-full rounded-md border px-3 py-2 ${
                 error && newNoteData.body === "" ? `border-red-600` : `border-gray-500`
               }`}
-              name="note-body"
-              id="note-body"
+              name="new-note-body"
+              id="new-note-body"
               placeholder="Body"
               value={newNoteData.body}
               onChange={(e) =>
@@ -136,8 +146,11 @@ function NewNoteModal() {
           </div>
 
           <div>
-            <h3 className="mr-3 font-semibold">Folder:</h3>
+            <label htmlFor="new-note-folder" className="block mr-3 font-semibold">
+              Folder:
+            </label>
             <select
+              id="new-note-folder"
               className="rounded-md border border-gray-500 bg-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-zinc-800"
               value={newNoteData.folderId || ""}
               onChange={(e) =>
